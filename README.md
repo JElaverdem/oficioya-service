@@ -32,4 +32,4 @@ Equipo de Desarrollo: Brian Fierro, Diego Mesa
 ## 5. Diagramas de Casos de Uso
 (Los diagramas se elaboraron sin mockups de interfaz grafica, cumpliendo las restricciones del Sprint 1).
 
-![Diagrama de Casos de Uso - Service](images/casos_uso_service.png)
+![Diagrama de Casos de Uso - Service](imagenes/casos_uso_service.png)
