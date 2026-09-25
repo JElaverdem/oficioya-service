@@ -24,10 +24,9 @@ Equipo de Desarrollo: Brian Fierro, Diego Mesa
 * REQ-SRV-009: El sistema debe permitir al contratante cancelar una solicitud en cualquier momento si esta aun no ha sido aceptada.
 * REQ-SRV-010: El sistema debe permitir a ambas partes (contratante y trabajador) cancelar una solicitud aceptada hasta 24 horas antes de la hora pactada sin penalizacion.
 * REQ-SRV-011: Si el contratante cancela con menos de 24 horas de anticipacion, el sistema debe bloquearlo para realizar nuevas solicitudes a ese mismo trabajador durante una semana.
-* REQ-SRV-012: Si el trabajador cancela con menos de 24 horas de anticipacion, el sistema debe penalizar su reputacion restando 0,5 puntos.
 
 ## 4. Consultas
-* REQ-SRV-013: El sistema debe permitir al contratante y al trabajador consultar el listado de sus solicitudes activas e historicas.
+* REQ-SRV-012: El sistema debe permitir al contratante y al trabajador consultar el listado de sus solicitudes activas e historicas.
 
 ## 5. Diagramas de Casos de Uso
 (Los diagramas se elaboraron sin mockups de interfaz grafica, cumpliendo las restricciones del Sprint 1).
