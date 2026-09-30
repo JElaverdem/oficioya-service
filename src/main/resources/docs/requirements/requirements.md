@@ -1,0 +1,196 @@
+# 📄 Requerimientos del Sistema
+
+## 1. Lista general de requerimientos
+
+El sistema de service OficioYa tiene los siguientes requerimientos (descripción a alto nivel): Debe permitir
+
+### 1.1 Requerimientos funcionales
+
+El sistema de service OficioYa debe tener la capacidad de:
+
+#### 1. Creacion de Solicitudes
+1. El sistema debe permitir al contratante crear una solicitud de servicio indicando descripcion en texto, fotografia, zona (barrio y direccion exacta), fecha y hora.
+2. El sistema le debe permitir al contratante escoger los trabajadores a enviar la solicitud.
+3. El sistema debe permitir al contratante enviar la misma solicitud a un solo trabajador o a multiples trabajadores de la zona de forma simultanea. 
+
+#### 2. Gestion y Estados de la Solicitud
+4. El sistema debe permitir al trabajador aceptar o rechazar una solicitud entrante en un plazo maximo de 30 minutos.-----
+5. Si el trabajador no responde en 30 minutos, el sistema debe cambiar automaticamente el estado de la solicitud a Expirada.
+6. Si multiples trabajadores aceptan una solicitud enviada en grupo, el sistema debe solicitar al contratante que cancele las que no desea tomar.
+7. El sistema le debe permitir a un trabajador completar un trabajo.
+
+#### 3. Cancelaciones y Penalidades
+8. El sistema debe permitir al contratante cancelar una solicitud en cualquier momento si esta aun no ha sido aceptada.
+9. El sistema debe permitir a ambas partes (contratante y trabajador) cancelar una solicitud aceptada hasta 24 horas antes de la hora pactada sin penalizacion.
+10. Si el contratante cancela con menos de 24 horas de anticipacion, el sistema debe bloquearlo para realizar nuevas solicitudes a ese mismo trabajador durante una semana.
+11. Si el trabajador cancela con menos de 24 horas de anticipacion, el sistema debe penalizar su reputacion restando 0,5 puntos.
+
+#### 4. Consultas
+12. El sistema debe permitir al contratante y al trabajador consultar el listado de sus solicitudes activas e historicas.
+
+### 1.2 Requerimientos no funcionales
+
+El sistema de service OficioYa debe tener:
+
+1. El sistema debe gestionar las solicitudes bajo los siguientes estados exactos: Pendiente, Aceptada, Cancelada, Rechazada, Cumplida, Expirada y Eliminada.
+2. Las solicitudes eliminadas no deben borrarse fisicamente de la base de datos (eliminacion logica).
+3. Si una solicitud se envia a multiples trabajadores, el sistema debe crearla como solicitudes independientes para cada trabajador.
+
+## 2. Diagramas de caso de uso
+
+### 2.1 Requerimiento Funcional 1
+
+| Campo | Descripción |
+|------|-------------|
+| **ID** | REQ-SRV-001 |
+| **Nombre del requerimiento** | Creación de una solicitud |
+| **Descripción** | El sistema debe permitir al contratante crear una solicitud de servicio indicando descripcion en texto, fotografia, zona (barrio y direccion exacta), fecha y hora, dejándola lista para ser enviada a un trabajador o más. |
+| **Precondiciones** | Para que el sistema cumpla con este requerimiento, el contratante ya debe de haber iniciado sesión. |
+| **Actor** | Contratante |
+| **Flujo principal** | 1. El contratante escoge crear una nueva solicitud.<br>2. El contratante agrega la descripción del servicio que se quiere hacer.<br>3. El contratante agrega opcionalmente una o más fotografías del trabajo a hacer.<br>4. El usuario escoge el barrio donde se encuentra y la dirección.<br>5. EL usuario agrega la fecha y la hora en la que se va a realizar el trabajo.<br>6. El usuario termina y confirma los datos de la solicitud. |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 1](../images/DCU-REQ-SRV-001) |
+| **Poscondiciones** | Se espera como resultado la solicitud lista para enviar con los datos verificados. |
+
+
+### 2.2 Requerimiento Funcional 2
+
+| Campo | Descripción |
+|------|-------------|
+| **ID** | REQ-SRV-002 |
+| **Nombre del requerimiento** | Envío de solicitudes |
+| **Descripción** | El sistema debe permitir al contratante enviar la misma solicitud a un solo trabajador o a multiples trabajadores de forma simultanea, verificando que el trabajador sí cubra la zona de la solicitud, al terminar y enviar la/s solicitud/es, se les debe enviar una notificación a los trabajadores, para esto, se conecta a la API de notificaciones. |
+| **Precondiciones** | Para que el sistema cumpla con este requerimiento, la solicitud ya debe de estar completada y verificada, el usuario ya escogió los trabajadores. |
+| **Actor** | Contratante y trabajadores |
+| **Flujo principal** | 1. El contratante termina de escoger los trabajadores.<br>2. El contratante confirma que quiere enviar la/s solicitud/es<br>3. El sistema envía las solicitudes a los trabajadores.<br>4. El sistema envía una notificación a los trabajadores. |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 2](../images/DCU-REQ-SRV-002) |
+| **Poscondiciones** | Se espera como resultado que las solicitudes por separado se hayan creado y enviado a cada trabajador, y que a cada uno le llegue una notificación de una nueva solicitud. |
+
+### 2.3 Requerimiento Funcional 3
+
+| Campo | Descripción |
+|------|-------------|
+| **ID** | REQ-SRV-003 |
+| **Nombre del requerimiento** | |
+| **Descripción** | Si una solicitud se envia a multiples trabajadores, el sistema debe crearla como solicitudes independientes para cada trabajador. |
+| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
+| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
+| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
+| **Diagrama de caso de uso** | *imagen y link*|
+| **Poscondiciones** | *Se espera como resultado …* |
+
+### 2.4 Requerimiento Funcional 4
+
+| Campo | Descripción |
+|------|-------------|
+| **ID** | REQ-SRV-004 |
+| **Nombre del requerimiento** | |
+| **Descripción** | *El sistema debe …* |
+| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
+| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
+| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
+| **Diagrama de caso de uso** | *imagen y link*|
+| **Poscondiciones** | *Se espera como resultado …* |
+
+### 2.5 Requerimiento Funcional 5
+
+| Campo | Descripción |
+|------|-------------|
+| **ID** | REQ-SRV-005 |
+| **Nombre del requerimiento** | |
+| **Descripción** | Si el trabajador no responde en 30 minutos, el sistema debe cambiar automaticamente el estado de la solicitud a Expirada. |
+| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
+| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
+| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
+| **Diagrama de caso de uso** | *imagen y link*|
+| **Poscondiciones** | *Se espera como resultado …* |
+
+### 2.6 Requerimiento Funcional 6
+
+| Campo | Descripción |
+|------|-------------|
+| **ID** | REQ-SRV-006 |
+| **Nombre del requerimiento** | |
+| **Descripción** | Si multiples trabajadores aceptan una solicitud enviada en grupo, el sistema debe solicitar al contratante que cancele las que no desea tomar. |
+| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
+| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
+| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
+| **Diagrama de caso de uso** | *imagen y link*|
+| **Poscondiciones** | *Se espera como resultado …* |
+
+### 2.7 Requerimiento Funcional 7
+
+| Campo | Descripción |
+|------|-------------|
+| **ID** | REQ-SRV-007 |
+| **Nombre del requerimiento** | |
+| **Descripción** | *El sistema debe …* |
+| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
+| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
+| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
+| **Diagrama de caso de uso** | *imagen y link*|
+| **Poscondiciones** | *Se espera como resultado …* |
+
+### 2.8 Requerimiento Funcional 8
+
+| Campo | Descripción |
+|------|-------------|
+| **ID** | REQ-SRV-008 |
+| **Nombre del requerimiento** | |
+| **Descripción** | *El sistema debe …* |
+| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
+| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
+| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
+| **Diagrama de caso de uso** | *imagen y link*|
+| **Poscondiciones** | *Se espera como resultado …* |
+
+### 2.9 Requerimiento Funcional 9
+
+| Campo | Descripción |
+|------|-------------|
+| **ID** | REQ-SRV-009 |
+| **Nombre del requerimiento** | |
+| **Descripción** | *El sistema debe …* |
+| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
+| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
+| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
+| **Diagrama de caso de uso** | *imagen y link*|
+| **Poscondiciones** | *Se espera como resultado …* |
+
+### 2.10 Requerimiento Funcional 10
+
+| Campo | Descripción |
+|------|-------------|
+| **ID** | REQ-SRV-0010 |
+| **Nombre del requerimiento** | |
+| **Descripción** | *El sistema debe …* |
+| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
+| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
+| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
+| **Diagrama de caso de uso** | *imagen y link*|
+| **Poscondiciones** | *Se espera como resultado …* |
+
+### 2.11 Requerimiento Funcional 11
+
+| Campo | Descripción |
+|------|-------------|
+| **ID** | REQ-SRV-0011 |
+| **Nombre del requerimiento** | |
+| **Descripción** | *El sistema debe …* |
+| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
+| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
+| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
+| **Diagrama de caso de uso** | *imagen y link*|
+| **Poscondiciones** | *Se espera como resultado …* |
+
+### 2.12 Requerimiento Funcional 12
+
+| Campo | Descripción |
+|------|-------------|
+| **ID** | REQ-SRV-0012 |
+| **Nombre del requerimiento** | |
+| **Descripción** | *El sistema debe …* |
+| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
+| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
+| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
+| **Diagrama de caso de uso** | *imagen y link*|
+| **Poscondiciones** | *Se espera como resultado …* |
