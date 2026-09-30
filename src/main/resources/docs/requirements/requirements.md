@@ -14,13 +14,13 @@ El sistema de service OficioYa debe tener la capacidad de:
 3. El sistema debe permitir al contratante enviar la misma solicitud a un solo trabajador o a multiples trabajadores de la zona de forma simultanea. 
 
 #### 2. Gestion y Estados de la Solicitud
-4. El sistema debe permitir al trabajador aceptar o rechazar una solicitud entrante en un plazo maximo de 30 minutos.-----
-5. Si el trabajador no responde en 30 minutos, el sistema debe cambiar automaticamente el estado de la solicitud a Expirada.
+//4. El sistema debe permitir al trabajador aceptar o rechazar una solicitud entrante en un plazo maximo de 30 minutos.-----
+//5. Si el trabajador no responde en 30 minutos, el sistema debe cambiar automaticamente el estado de la solicitud a Expirada.
 6. Si multiples trabajadores aceptan una solicitud enviada en grupo, el sistema debe solicitar al contratante que cancele las que no desea tomar.
 7. El sistema le debe permitir a un trabajador completar un trabajo.
 
 #### 3. Cancelaciones y Penalidades
-8. El sistema debe permitir al contratante cancelar una solicitud en cualquier momento si esta aun no ha sido aceptada.
+8. El sistema debe permitir al contratante cancelar una solicitud en cualquier momento si esta aún no ha sido aceptada.
 9. El sistema debe permitir a ambas partes (contratante y trabajador) cancelar una solicitud aceptada hasta 24 horas antes de la hora pactada sin penalizacion.
 10. Si el contratante cancela con menos de 24 horas de anticipacion, el sistema debe bloquearlo para realizar nuevas solicitudes a ese mismo trabajador durante una semana.
 11. Si el trabajador cancela con menos de 24 horas de anticipacion, el sistema debe penalizar su reputacion restando 0,5 puntos.
@@ -47,36 +47,35 @@ El sistema de service OficioYa debe tener:
 | **Descripción** | El sistema debe permitir al contratante crear una solicitud de servicio indicando descripcion en texto, fotografia, zona (barrio y direccion exacta), fecha y hora, dejándola lista para ser enviada a un trabajador o más. |
 | **Precondiciones** | Para que el sistema cumpla con este requerimiento, el contratante ya debe de haber iniciado sesión. |
 | **Actor** | Contratante |
-| **Flujo principal** | 1. El contratante escoge crear una nueva solicitud.<br>2. El contratante agrega la descripción del servicio que se quiere hacer.<br>3. El contratante agrega opcionalmente una o más fotografías del trabajo a hacer.<br>4. El usuario escoge el barrio donde se encuentra y la dirección.<br>5. EL usuario agrega la fecha y la hora en la que se va a realizar el trabajo.<br>6. El usuario termina y confirma los datos de la solicitud. |
+| **Flujo principal** | 1. El contratante escoge crear una nueva solicitud.<br>2. El contratante agrega la descripción del servicio que se quiere hacer.<br>3. El contratante agrega opcionalmente una o más fotografías del trabajo a hacer.<br>4. El usuario escoge el barrio donde se encuentra y la dirección.<br>5. EL usuario agrega la fecha y la hora en la que se va a realizar el trabajo.<br>6. El usuario termina y confirma los datos de la solicitud.<br>7. El sistema verifica que todos los datos de la solicitud sean correctos. |
 | **Diagrama de caso de uso** | ![Diagrama caso uso - 1](../images/DCU-REQ-SRV-001) |
 | **Poscondiciones** | Se espera como resultado la solicitud lista para enviar con los datos verificados. |
-
 
 ### 2.2 Requerimiento Funcional 2
 
 | Campo | Descripción |
 |------|-------------|
-| **ID** | REQ-SRV-002 |
-| **Nombre del requerimiento** | Envío de solicitudes |
-| **Descripción** | El sistema debe permitir al contratante enviar la misma solicitud a un solo trabajador o a multiples trabajadores de forma simultanea, verificando que el trabajador sí cubra la zona de la solicitud, al terminar y enviar la/s solicitud/es, se les debe enviar una notificación a los trabajadores, para esto, se conecta a la API de notificaciones. |
-| **Precondiciones** | Para que el sistema cumpla con este requerimiento, la solicitud ya debe de estar completada y verificada, el usuario ya escogió los trabajadores. |
+| **ID** | REQ-SRV-003 |
+| **Nombre del requerimiento** | Selección de trabajadores|
+| **Descripción** | El sistema le debe permitir al contratante escoger los trabajadores a enviar la solicitud. |
+| **Precondiciones** | Para que el sistema cumpla con este requerimiento, la solicitud ya debe de estar creada y verificada, los datos del barrio son correctos. |
 | **Actor** | Contratante y trabajadores |
-| **Flujo principal** | 1. El contratante termina de escoger los trabajadores.<br>2. El contratante confirma que quiere enviar la/s solicitud/es<br>3. El sistema envía las solicitudes a los trabajadores.<br>4. El sistema envía una notificación a los trabajadores. |
+| **Flujo principal** | 1. El contratante termina de llenar la solicitud.<br>2. El sistema verifica los datos de la solicitud.<br>3. El sistema lleva al contratante a escoger los trabajadores.<br>4. El sistema le muestra los trabajadores disponibles para esa zona.<br>5. El contratante escoge uno o varios trabajadores.<br>6. El contratante confirma los trabajadores conocidos. |
 | **Diagrama de caso de uso** | ![Diagrama caso uso - 2](../images/DCU-REQ-SRV-002) |
-| **Poscondiciones** | Se espera como resultado que las solicitudes por separado se hayan creado y enviado a cada trabajador, y que a cada uno le llegue una notificación de una nueva solicitud. |
+| **Poscondiciones** | Se espera como resultado los trabajadores que el contratante escogió verificados y las personas listas para enviar las solicitudes. |
 
 ### 2.3 Requerimiento Funcional 3
 
 | Campo | Descripción |
 |------|-------------|
 | **ID** | REQ-SRV-003 |
-| **Nombre del requerimiento** | |
-| **Descripción** | Si una solicitud se envia a multiples trabajadores, el sistema debe crearla como solicitudes independientes para cada trabajador. |
-| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
-| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
-| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
-| **Diagrama de caso de uso** | *imagen y link*|
-| **Poscondiciones** | *Se espera como resultado …* |
+| **Nombre del requerimiento** | Envío de solicitudes |
+| **Descripción** | El sistema debe permitir al contratante enviar la misma solicitud a un solo trabajador o a multiples trabajadores de forma simultanea, al terminar y enviar la/s solicitud/es, se les debe enviar una notificación a los trabajadores, para esto, se conecta a la API de notificaciones. |
+| **Precondiciones** | Para que el sistema cumpla con este requerimiento, la solicitud ya debe de estar completada y verificada, el usuario ya escogió los trabajadores y el sistema ya verificó estos trabajadores. |
+| **Actor** | Contratante y trabajadores |
+| **Flujo principal** | 1. El contratante termina de escoger los trabajadores.<br>2. El contratante confirma que quiere enviar la/s solicitud/es<br>3. El sistema envía las solicitudes a los trabajadores.<br>4. El sistema envía una notificación a los trabajadores. |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 3](../images/DCU-REQ-SRV-003) |
+| **Poscondiciones** | Se espera como resultado que las solicitudes por separado se hayan creado y enviado a cada trabajador, y que a cada uno le llegue una notificación de una nueva solicitud. |
 
 ### 2.4 Requerimiento Funcional 4
 
@@ -122,13 +121,13 @@ El sistema de service OficioYa debe tener:
 | Campo | Descripción |
 |------|-------------|
 | **ID** | REQ-SRV-007 |
-| **Nombre del requerimiento** | |
-| **Descripción** | *El sistema debe …* |
-| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
-| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
-| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
-| **Diagrama de caso de uso** | *imagen y link*|
-| **Poscondiciones** | *Se espera como resultado …* |
+| **Nombre del requerimiento** | Completar trabajo |
+| **Descripción** | El sistema le debe permitir a un trabajador completar un trabajo y enviar una notificación conectandose con la API de notifications para avisar al contratante que el trabajo fue finalizado. |
+| **Precondiciones** | Para que el sistema cumpla con este requerimiento, el trabajo ya debe estarse haciendo, la hora debe ser después de la hora del trabajo. |
+| **Actor** | Contratante y trabajador |
+| **Flujo principal** | 1. El trabajador termina el trabajo.<br>2. El trabajador entra al sistema para terminar el trabajo.<br>3. El trabajador escoge terminar el trabajo.<br>4. El sistema hace las verificaciones para poder terminar el trabajo.<br>5. El sistema marca el trabajo como cumplida.<br>6. El sistema se conecta con notificaciones y le envía una notificación al contratante. |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 7](../images/DCU-REQ-SRV-007) |
+| **Poscondiciones** | Se espera como resultado el trabajo marcado como cumplida y la notificación enviada al contratante. |
 
 ### 2.8 Requerimiento Funcional 8
 
