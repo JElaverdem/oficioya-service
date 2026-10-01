@@ -32,7 +32,7 @@ El sistema de service OficioYa debe tener la capacidad de:
 
 El sistema de service OficioYa debe tener:
 
-1. El sistema debe gestionar las solicitudes bajo los siguientes estados exactos: Pendiente, Aceptada, Cancelada, Rechazada, Cumplida, Expirada y Eliminada.
+1. El sistema debe gestionar las solicitudes bajo los siguientes estados exactos: Pendiente, Aceptada, Conflicto, Cancelada, Rechazada, Cumplida, Expirada y Eliminada.
 2. Las solicitudes eliminadas no deben borrarse fisicamente de la base de datos (eliminacion logica).
 3. Si una solicitud se envia a multiples trabajadores, el sistema debe crearla como solicitudes independientes para cada trabajador.
 
@@ -110,11 +110,11 @@ El sistema de service OficioYa debe tener:
 | **ID** | REQ-SRV-006 |
 | **Nombre del requerimiento** | |
 | **Descripción** | Si multiples trabajadores aceptan una solicitud enviada en grupo, el sistema debe solicitar al contratante que cancele las que no desea tomar. |
-| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
-| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
-| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
-| **Diagrama de caso de uso** | *imagen y link*|
-| **Poscondiciones** | *Se espera como resultado …* |
+| **Precondiciones** | Para que el sistema cumpla con este requerimiento, las solicitudes a los demás trabajadores ha sido enviada, más de un trabajador aceptó la solicitud antes de que se expirara. |
+| **Actor** | Contratante y trabajadores |
+| **Flujo principal** | 1. El contratante envía una solicitud a más de un trabajador.<br>2. Más de un trabajador acepta la solicitud antes de que expirara.<br>3. El sistema cambia la solicitud a estado Conflicto.<br>4. El sistema le envía una notificación al contratante de que la solicitud fue aceptada por más de un trabajador.<br>5. El contratante entra a mirar la solicitud.<br>6. El sistema le muestra al contratante los trabajadores que aceptaron la solicitud.<br>7. El contrante escoge un trabajador para que realice el trabajo.<br>8. El sistema cancela las solicitudes de los contratantes no escogidos y la de los que aún no han aceptado la solicitud. |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 6](../images/DCU-REQ-SRV-006) |
+| **Poscondiciones** | Se espera como resultado que se registre bien la solicitud al trabajador escogido y que ponga en estado 'Cancelada' la solicitud de los trabajadores no escogidos y que aún no han aceptado o rechazado la solicitud. |
 
 ### 2.7 Requerimiento Funcional 7
 
@@ -134,13 +134,13 @@ El sistema de service OficioYa debe tener:
 | Campo | Descripción |
 |------|-------------|
 | **ID** | REQ-SRV-008 |
-| **Nombre del requerimiento** | |
-| **Descripción** | *El sistema debe …* |
-| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
-| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
-| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
-| **Diagrama de caso de uso** | *imagen y link*|
-| **Poscondiciones** | *Se espera como resultado …* |
+| **Nombre del requerimiento** | Cancelar solicitud sin aceptar |
+| **Descripción** | El sistema debe permitir al contratante cancelar una solicitud en cualquier momento si esta aún no ha sido aceptada. |
+| **Precondiciones** | Para que el sistema cumpla con este requerimiento, el contratante ya debió de haber enviado una solicitud a un trabajador, el trabajador aún no ha aceptado la solicitud que se le ha enviado. |
+| **Actor** | Contratante |
+| **Flujo principal** | 1. El contratante envía una solicitud al trabajador.<br>2. El contratante ve que no ha sido aceptada y decide cancelarla.<br>3. El sistema cambia el estado de la solicitud a cancelada.<br>4. El sistema le envía una notificación al trabajador que la solicitud fue cancelada. |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 8](../images/DCU-REQ-SRV-008) |
+| **Poscondiciones** | Se espera como resultado que la solicitud quede en estado cancelada y que se le haya enviado la notificación al trabajador. |
 
 ### 2.9 Requerimiento Funcional 9
 
@@ -152,7 +152,7 @@ El sistema de service OficioYa debe tener:
 | **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
 | **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
 | **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
-| **Diagrama de caso de uso** | *imagen y link*|
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 9](../images/DCU-REQ-SRV-009) |
 | **Poscondiciones** | *Se espera como resultado …* |
 
 ### 2.10 Requerimiento Funcional 10
@@ -165,7 +165,7 @@ El sistema de service OficioYa debe tener:
 | **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
 | **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
 | **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
-| **Diagrama de caso de uso** | *imagen y link*|
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 10](../images/DCU-REQ-SRV-0010) |
 | **Poscondiciones** | *Se espera como resultado …* |
 
 ### 2.11 Requerimiento Funcional 11
@@ -178,7 +178,7 @@ El sistema de service OficioYa debe tener:
 | **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
 | **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
 | **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
-| **Diagrama de caso de uso** | *imagen y link*|
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 11](../images/DCU-REQ-SRV-0011) |
 | **Poscondiciones** | *Se espera como resultado …* |
 
 ### 2.12 Requerimiento Funcional 12
@@ -191,5 +191,5 @@ El sistema de service OficioYa debe tener:
 | **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
 | **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
 | **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
-| **Diagrama de caso de uso** | *imagen y link*|
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 12](../images/DCU-REQ-SRV-0012) |
 | **Poscondiciones** | *Se espera como resultado …* |
