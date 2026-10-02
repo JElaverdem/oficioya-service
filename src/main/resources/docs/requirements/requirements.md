@@ -15,8 +15,8 @@ El sistema de service OficioYa debe tener la capacidad de:
 
 #### 2. Gestion y Estados de la Solicitud
 <!--//4. El sistema debe permitir al trabajador aceptar o rechazar una solicitud entrante en un plazo maximo de 30 minutos.-----
-//5. Si el trabajador no responde en 30 minutos, el sistema debe cambiar automaticamente el estado de la solicitud a Expirada.
-6. Si multiples trabajadores aceptan una solicitud enviada en grupo, el sistema debe solicitar al contratante que cancele las que no desea tomar.-->
+//5. Si el trabajador no responde en 30 minutos, el sistema debe cambiar automaticamente el estado de la solicitud a Expirada.-->
+6. Si multiples trabajadores aceptan una solicitud enviada en grupo, el sistema debe solicitar al contratante que cancele las que no desea tomar.
 7. El sistema le debe permitir a un trabajador completar un trabajo.
 
 #### 3. Cancelaciones y Penalidades
