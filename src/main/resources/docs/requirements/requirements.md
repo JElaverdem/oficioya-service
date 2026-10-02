@@ -14,9 +14,9 @@ El sistema de service OficioYa debe tener la capacidad de:
 3. El sistema debe permitir al contratante enviar la misma solicitud a un solo trabajador o a multiples trabajadores de la zona de forma simultanea. 
 
 #### 2. Gestion y Estados de la Solicitud
-//4. El sistema debe permitir al trabajador aceptar o rechazar una solicitud entrante en un plazo maximo de 30 minutos.-----
+<!--//4. El sistema debe permitir al trabajador aceptar o rechazar una solicitud entrante en un plazo maximo de 30 minutos.-----
 //5. Si el trabajador no responde en 30 minutos, el sistema debe cambiar automaticamente el estado de la solicitud a Expirada.
-6. Si multiples trabajadores aceptan una solicitud enviada en grupo, el sistema debe solicitar al contratante que cancele las que no desea tomar.
+6. Si multiples trabajadores aceptan una solicitud enviada en grupo, el sistema debe solicitar al contratante que cancele las que no desea tomar.-->
 7. El sistema le debe permitir a un trabajador completar un trabajo.
 
 #### 3. Cancelaciones y Penalidades
@@ -35,6 +35,8 @@ El sistema de service OficioYa debe tener:
 1. El sistema debe gestionar las solicitudes bajo los siguientes estados exactos: Pendiente, Aceptada, Conflicto, Cancelada, Rechazada, Cumplida, Expirada y Eliminada.
 2. Las solicitudes eliminadas no deben borrarse fisicamente de la base de datos (eliminacion logica).
 3. Si una solicitud se envia a multiples trabajadores, el sistema debe crearla como solicitudes independientes para cada trabajador.
+4. Al revisar el historial de solicitudes Aparecen con el nombre del contratante si es una solicitud a un trabajador o el nombre del trabajador si es una solicitud que hizo el contratante, el día y hora a la que se va a realizar o se realizó el trabajo y el estado en el que está.
+5. Al revisar el historial de solicitudes no aparecen las solicitudes eliminadas lógicamente.
 
 ## 2. Diagramas de caso de uso
 
@@ -76,7 +78,7 @@ El sistema de service OficioYa debe tener:
 | **Flujo principal** | 1. El contratante termina de escoger los trabajadores.<br>2. El contratante confirma que quiere enviar la/s solicitud/es<br>3. El sistema envía las solicitudes a los trabajadores.<br>4. El sistema envía una notificación a los trabajadores. |
 | **Diagrama de caso de uso** | ![Diagrama caso uso - 3](../images/DCU-REQ-SRV-003) |
 | **Poscondiciones** | Se espera como resultado que las solicitudes por separado se hayan creado y enviado a cada trabajador, y que a cada uno le llegue una notificación de una nueva solicitud. |
-
+<!--
 ### 2.4 Requerimiento Funcional 4
 
 | Campo | Descripción |
@@ -102,13 +104,13 @@ El sistema de service OficioYa debe tener:
 | **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
 | **Diagrama de caso de uso** | *imagen y link*|
 | **Poscondiciones** | *Se espera como resultado …* |
-
+-->
 ### 2.6 Requerimiento Funcional 6
 
 | Campo | Descripción |
 |------|-------------|
 | **ID** | REQ-SRV-006 |
-| **Nombre del requerimiento** | |
+| **Nombre del requerimiento** | Manejo de varias solicitudes aceptadas |
 | **Descripción** | Si multiples trabajadores aceptan una solicitud enviada en grupo, el sistema debe solicitar al contratante que cancele las que no desea tomar. |
 | **Precondiciones** | Para que el sistema cumpla con este requerimiento, las solicitudes a los demás trabajadores ha sido enviada, más de un trabajador aceptó la solicitud antes de que se expirara. |
 | **Actor** | Contratante y trabajadores |
@@ -121,7 +123,7 @@ El sistema de service OficioYa debe tener:
 | Campo | Descripción |
 |------|-------------|
 | **ID** | REQ-SRV-007 |
-| **Nombre del requerimiento** | Completar trabajo |
+| **Nombre del requerimiento** | Completar un trabajo |
 | **Descripción** | El sistema le debe permitir a un trabajador completar un trabajo y enviar una notificación conectandose con la API de notifications para avisar al contratante que el trabajo fue finalizado. |
 | **Precondiciones** | Para que el sistema cumpla con este requerimiento, el trabajo ya debe estarse haciendo, la hora debe ser después de la hora del trabajo. |
 | **Actor** | Contratante y trabajador |
@@ -147,49 +149,49 @@ El sistema de service OficioYa debe tener:
 | Campo | Descripción |
 |------|-------------|
 | **ID** | REQ-SRV-009 |
-| **Nombre del requerimiento** | |
-| **Descripción** | *El sistema debe …* |
-| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
-| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
-| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
+| **Nombre del requerimiento** | Cancelar solicitud sin penalización |
+| **Descripción** | El sistema debe permitir a ambas partes (contratante y trabajador) cancelar una solicitud aceptada hasta 24 horas antes de la hora pactada sin penalizacion. |
+| **Precondiciones** | Para que el sistema cumpla con este requerimiento, la solicitud que se quiere cancelar ya debe de estar aceptada, quedan más de 24 horas antes de la fecha del trabajo. |
+| **Actor** | Contratante y trabajador |
+| **Flujo principal** | **Primer flujo**<br>1. El contratante revisa los trabajos abiertos.<br>2. El contratante escoge un trabajo el cual se realiza dentro de más de 24 horas.<br>3. El contratante elige cancelar la solicitud.<br>4. El sistema cambia el estado de la solicitud a cancelada.<br>5. El sistema envía una notificación al trabajador de que la solicitud fue cancelada.<br>**Segundo flujo**<br>1. El trabajador revisa los trabajos que tiene pendientes.<br>2. El trabajador escoge un trabajo el cual se realiza dentro de más de 24 horas.<br>3. El trabajador escoge cancelar este trabajo.<br>4. El sistema cambia el estado de la solicitud a cancelada.<br>5. El sistema le envía una notificación al contratante de que el trabajo fue cancelado. |
 | **Diagrama de caso de uso** | ![Diagrama caso uso - 9](../images/DCU-REQ-SRV-009) |
-| **Poscondiciones** | *Se espera como resultado …* |
+| **Poscondiciones** | Se espera como resultado la solicitud en estado cancelada y la notificación enviada al contratante o trabajador. |
 
 ### 2.10 Requerimiento Funcional 10
 
 | Campo | Descripción |
 |------|-------------|
 | **ID** | REQ-SRV-0010 |
-| **Nombre del requerimiento** | |
-| **Descripción** | *El sistema debe …* |
-| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
-| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
-| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
+| **Nombre del requerimiento** | Contratante cancela con menos 24 horas de anticipación |
+| **Descripción** | Si el contratante cancela con menos de 24 horas de anticipacion, el sistema debe bloquearlo para realizar nuevas solicitudes a ese mismo trabajador durante una semana. |
+| **Precondiciones** | Para que el sistema cumpla con este requerimiento, la solicitud ya debe haber sido aceptada, faltan menos de 24 horas para que se realice el trabajo. |
+| **Actor** | Contratante y trabajador |
+| **Flujo principal** | 1. El contratante revisa los trabajos abiertos.<br>2. El contratante escoge un trabajo que se realiza en menos de 24 horas.<br>3. El contrantante cancela el trabajo.<br>4. El sistema verifica si faltan menos de 24 horas para el trabajo.<br>5. El sistema comprueba que faltan menos de 24 horas para el trabajo.<br>6. El sistema bloquea al contrantante de poder enviar una solicitud al trabajador que le canceló el trabajo.<br>7. El sistema le envía una notificación al trabajador de que el trabajo fue cancelado. |
 | **Diagrama de caso de uso** | ![Diagrama caso uso - 10](../images/DCU-REQ-SRV-0010) |
-| **Poscondiciones** | *Se espera como resultado …* |
+| **Poscondiciones** | Se espera como resultado el bloqueo del contratante para enviarle una solicitud de nuevo al mismo trabajador dentro de una semana, la solicitud en estado cancelada y la notificación enviada al trabajador. |
 
 ### 2.11 Requerimiento Funcional 11
 
 | Campo | Descripción |
 |------|-------------|
 | **ID** | REQ-SRV-0011 |
-| **Nombre del requerimiento** | |
-| **Descripción** | *El sistema debe …* |
-| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
-| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
-| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
+| **Nombre del requerimiento** | Trabajador cancela con menos de 24 horas de anticipación|
+| **Descripción** | Si el trabajador cancela con menos de 24 horas de anticipacion, el sistema debe penalizar su reputacion restando 0,5 puntos. |
+| **Precondiciones** | Para que el sistema cumpla con este requerimiento, la solicitud ya debe haber sido aceptada, faltan menos de 24 horas para que se realice el trabajo. |
+| **Actor** | Contratante y trabajador |
+| **Flujo principal** | 1. El trabajador revisa los trabajos pendientes.<br>2. El trabajador escoge un trabajo que se realiza en menos de 24 horas.<br>3. El trabajador cancela el trabajo.<br>4. El sistema verifica si faltan menos de 24 horas para el trabajo.<br>5. El sistema comprueba que faltan menos de 24 horas para el trabajo.<br>6. El sistema resta 0,5 puntos de la reputación del trabajador.<br>7. El sistema le envía una notificación al contratante de que el trabajo fue cancelado. |
 | **Diagrama de caso de uso** | ![Diagrama caso uso - 11](../images/DCU-REQ-SRV-0011) |
-| **Poscondiciones** | *Se espera como resultado …* |
+| **Poscondiciones** | Se espera como resultado el trabajador con una reputación con 0,5 puntos menos y la notificación enviada al contratante. |
 
 ### 2.12 Requerimiento Funcional 12
 
 | Campo | Descripción |
 |------|-------------|
 | **ID** | REQ-SRV-0012 |
-| **Nombre del requerimiento** | |
-| **Descripción** | *El sistema debe …* |
-| **Precondiciones** | *Para que el sistema cumpla con este requerimiento, Bankify debe tener previamente …* |
-| **Actor** | *(El actor debe estar definido en el diagrama de contexto)* |
-| **Flujo principal** | 1. El actor …<br>2. El sistema …<br>3. El sistema … |
+| **Nombre del requerimiento** | Consultas de solicitudes |
+| **Descripción** | El sistema debe permitir al contratante y al trabajador consultar el listado de sus solicitudes activas e historicas. |
+| **Precondiciones** | Para que el sistema cumpla con este requerimiento, el usuario debe de haber iniciado sesión. |
+| **Actor** | Contratante y trabajador |
+| **Flujo principal** | 1. El contratante o trabajador van a su propio perfil.<br>2. El contratante o trabajador escoge la opción de ver sus solicitudes.<br>3. El sistema filtra las solicitudes que se pueden ver (todas menos las eliminadas).<br>4. El sistema le muestra las solicitudes al usuario que las está revisando. |
 | **Diagrama de caso de uso** | ![Diagrama caso uso - 12](../images/DCU-REQ-SRV-0012) |
-| **Poscondiciones** | *Se espera como resultado …* |
+| **Poscondiciones** | Se espera como resultado que se puedan ver todas las solicitudes realizadas y que no se muestren las eliminadas. |
