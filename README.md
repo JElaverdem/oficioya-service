@@ -51,3 +51,6 @@ Equipo de Desarrollo: Brian Fierro, Diego Mesa
 **REQ-SRV-012:** Consultar solicitudes activas e históricas
 
 ![REQ-SRV-012](docs/imagenes/REQ-SRV-012.png)
+## Diagrama entidad-relación
+
+![ER Service](docs/imagenes/ER-Service.png)
