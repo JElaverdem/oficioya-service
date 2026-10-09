@@ -32,3 +32,18 @@ Equipo de Desarrollo: Brian Fierro, Diego Mesa
 (Los diagramas se elaboraron sin mockups de interfaz grafica, cumpliendo las restricciones del Sprint 1).
 
 ![Diagrama de Casos de Uso - Service](docs/imagenes/casos_de_uso_service.png)
+### 3. Cancelaciones y Penalidades
+
+**REQ-SRV-009:** Cancelar solicitud aún no aceptada
+![REQ-SRV-009](docs/REQ-SRV-009.png)
+
+**REQ-SRV-010:** Cancelar solicitud aceptada sin penalización
+![REQ-SRV-010](docs/REQ-SRV-010.png)
+
+**REQ-SRV-011:** Penalizar cancelación tardía del contratante
+![REQ-SRV-011](docs/REQ-SRV-011.png)
+
+### 4. Consultas
+
+**REQ-SRV-012:** Consultar solicitudes activas e históricas
+![REQ-SRV-012](docs/REQ-SRV-012.png)
