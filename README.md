@@ -1,6 +1,6 @@
-# oficioya-notification
+# oficioya-service
 
-## Requerimientos Funcionales - Dominio Notification
+## Requerimientos Funcionales - Dominio Service
 
 | Campo | Descripción|
 |---|---|
@@ -14,12 +14,15 @@
 
 ## Diagrama entidad-relación
 
-![ER Notification](/src/main/resources/docs/uml/ER-Service.png)
+![ER Service](/src/main/resources/docs/uml/ER-Service.png)
 
 ## Diagrama de clases
 
-![Diagrama de clases Notification](/src/main/resources/docs/uml/DiagramaClases-Service.png)
+![Diagrama de clases Service](/src/main/resources/docs/uml/DiagramaClases-Service.png)
 
 ## Mock Up
 
-![Mock Up Solicitud entrante](/src/main/resources/docs/images/)
+![Mock Up Creacion Solicitud](/src/main/resources/docs/images/MockUp-CreacionSolicitud)
+![Mock Up Escoger Trabajadores](/src/main/resources/docs/images/MockUp-EscogerTrabajadores)
+![Mock Up Confirmar Envio](/src/main/resources/docs/images/MockUp-ConfirmarEnvio)
+![Mock Up Solicitud Enviada](/src/main/resources/docs/images/MockUp-SolicitudEnviada)
