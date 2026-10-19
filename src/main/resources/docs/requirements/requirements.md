@@ -50,7 +50,7 @@ El sistema de service OficioYa debe tener:
 | **Precondiciones** | Para que el sistema cumpla con este requerimiento, el contratante ya debe de haber iniciado sesión. |
 | **Actor** | Contratante |
 | **Flujo principal** | 1. El contratante escoge crear una nueva solicitud.<br>2. El contratante agrega la descripción del servicio que se quiere hacer.<br>3. El contratante agrega opcionalmente una o más fotografías del trabajo a hacer.<br>4. El usuario escoge el barrio donde se encuentra y la dirección.<br>5. EL usuario agrega la fecha y la hora en la que se va a realizar el trabajo.<br>6. El usuario termina y confirma los datos de la solicitud.<br>7. El sistema verifica que todos los datos de la solicitud sean correctos. |
-| **Diagrama de caso de uso** | ![Diagrama caso uso - 1](../images/DCU-REQ-SRV-001) |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 1](../images/DCU-REQ-SRV-001.png) |
 | **Poscondiciones** | Se espera como resultado la solicitud lista para enviar con los datos verificados. |
 
 ### 2.2 Requerimiento Funcional 2
@@ -63,7 +63,7 @@ El sistema de service OficioYa debe tener:
 | **Precondiciones** | Para que el sistema cumpla con este requerimiento, la solicitud ya debe de estar creada y verificada, los datos del barrio son correctos. |
 | **Actor** | Contratante y trabajadores |
 | **Flujo principal** | 1. El contratante termina de llenar la solicitud.<br>2. El sistema verifica los datos de la solicitud.<br>3. El sistema lleva al contratante a escoger los trabajadores.<br>4. El sistema le muestra los trabajadores disponibles para esa zona.<br>5. El contratante escoge uno o varios trabajadores.<br>6. El contratante confirma los trabajadores conocidos. |
-| **Diagrama de caso de uso** | ![Diagrama caso uso - 2](../images/DCU-REQ-SRV-002) |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 2](../images/DCU-REQ-SRV-002.png) |
 | **Poscondiciones** | Se espera como resultado los trabajadores que el contratante escogió verificados y las personas listas para enviar las solicitudes. |
 
 ### 2.3 Requerimiento Funcional 3
@@ -76,7 +76,7 @@ El sistema de service OficioYa debe tener:
 | **Precondiciones** | Para que el sistema cumpla con este requerimiento, la solicitud ya debe de estar completada y verificada, el usuario ya escogió los trabajadores y el sistema ya verificó estos trabajadores. |
 | **Actor** | Contratante y trabajadores |
 | **Flujo principal** | 1. El contratante termina de escoger los trabajadores.<br>2. El contratante confirma que quiere enviar la/s solicitud/es<br>3. El sistema envía las solicitudes a los trabajadores.<br>4. El sistema envía una notificación a los trabajadores. |
-| **Diagrama de caso de uso** | ![Diagrama caso uso - 3](../images/DCU-REQ-SRV-003) |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 3](../images/DCU-REQ-SRV-003.png) |
 | **Poscondiciones** | Se espera como resultado que las solicitudes por separado se hayan creado y enviado a cada trabajador, y que a cada uno le llegue una notificación de una nueva solicitud. |
 <!--
 ### 2.4 Requerimiento Funcional 4
@@ -115,7 +115,7 @@ El sistema de service OficioYa debe tener:
 | **Precondiciones** | Para que el sistema cumpla con este requerimiento, las solicitudes a los demás trabajadores ha sido enviada, más de un trabajador aceptó la solicitud antes de que se expirara. |
 | **Actor** | Contratante y trabajadores |
 | **Flujo principal** | 1. El contratante envía una solicitud a más de un trabajador.<br>2. Más de un trabajador acepta la solicitud antes de que expirara.<br>3. El sistema cambia la solicitud a estado Conflicto.<br>4. El sistema le envía una notificación al contratante de que la solicitud fue aceptada por más de un trabajador.<br>5. El contratante entra a mirar la solicitud.<br>6. El sistema le muestra al contratante los trabajadores que aceptaron la solicitud.<br>7. El contrante escoge un trabajador para que realice el trabajo.<br>8. El sistema cancela las solicitudes de los contratantes no escogidos y la de los que aún no han aceptado la solicitud. |
-| **Diagrama de caso de uso** | ![Diagrama caso uso - 6](../images/DCU-REQ-SRV-006) |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 6](../images/DCU-REQ-SRV-006.png) |
 | **Poscondiciones** | Se espera como resultado que se registre bien la solicitud al trabajador escogido y que ponga en estado 'Cancelada' la solicitud de los trabajadores no escogidos y que aún no han aceptado o rechazado la solicitud. |
 
 ### 2.7 Requerimiento Funcional 7
@@ -128,7 +128,7 @@ El sistema de service OficioYa debe tener:
 | **Precondiciones** | Para que el sistema cumpla con este requerimiento, el trabajo ya debe estarse haciendo, la hora debe ser después de la hora del trabajo. |
 | **Actor** | Contratante y trabajador |
 | **Flujo principal** | 1. El trabajador termina el trabajo.<br>2. El trabajador entra al sistema para terminar el trabajo.<br>3. El trabajador escoge terminar el trabajo.<br>4. El sistema hace las verificaciones para poder terminar el trabajo.<br>5. El sistema marca el trabajo como cumplida.<br>6. El sistema se conecta con notificaciones y le envía una notificación al contratante. |
-| **Diagrama de caso de uso** | ![Diagrama caso uso - 7](../images/DCU-REQ-SRV-007) |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 7](../images/DCU-REQ-SRV-007.png) |
 | **Poscondiciones** | Se espera como resultado el trabajo marcado como cumplida y la notificación enviada al contratante. |
 
 ### 2.8 Requerimiento Funcional 8
@@ -141,7 +141,7 @@ El sistema de service OficioYa debe tener:
 | **Precondiciones** | Para que el sistema cumpla con este requerimiento, el contratante ya debió de haber enviado una solicitud a un trabajador, el trabajador aún no ha aceptado la solicitud que se le ha enviado. |
 | **Actor** | Contratante |
 | **Flujo principal** | 1. El contratante envía una solicitud al trabajador.<br>2. El contratante ve que no ha sido aceptada y decide cancelarla.<br>3. El sistema cambia el estado de la solicitud a cancelada.<br>4. El sistema le envía una notificación al trabajador que la solicitud fue cancelada. |
-| **Diagrama de caso de uso** | ![Diagrama caso uso - 8](../images/DCU-REQ-SRV-008) |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 8](../images/DCU-REQ-SRV-008.png) |
 | **Poscondiciones** | Se espera como resultado que la solicitud quede en estado cancelada y que se le haya enviado la notificación al trabajador. |
 
 ### 2.9 Requerimiento Funcional 9
@@ -154,7 +154,7 @@ El sistema de service OficioYa debe tener:
 | **Precondiciones** | Para que el sistema cumpla con este requerimiento, la solicitud que se quiere cancelar ya debe de estar aceptada, quedan más de 24 horas antes de la fecha del trabajo. |
 | **Actor** | Contratante y trabajador |
 | **Flujo principal** | **Primer flujo**<br>1. El contratante revisa los trabajos abiertos.<br>2. El contratante escoge un trabajo el cual se realiza dentro de más de 24 horas.<br>3. El contratante elige cancelar la solicitud.<br>4. El sistema cambia el estado de la solicitud a cancelada.<br>5. El sistema envía una notificación al trabajador de que la solicitud fue cancelada.<br>**Segundo flujo**<br>1. El trabajador revisa los trabajos que tiene pendientes.<br>2. El trabajador escoge un trabajo el cual se realiza dentro de más de 24 horas.<br>3. El trabajador escoge cancelar este trabajo.<br>4. El sistema cambia el estado de la solicitud a cancelada.<br>5. El sistema le envía una notificación al contratante de que el trabajo fue cancelado. |
-| **Diagrama de caso de uso** | ![Diagrama caso uso - 9](../images/DCU-REQ-SRV-009) |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 9](../images/DCU-REQ-SRV-009.png) |
 | **Poscondiciones** | Se espera como resultado la solicitud en estado cancelada y la notificación enviada al contratante o trabajador. |
 
 ### 2.10 Requerimiento Funcional 10
@@ -167,7 +167,7 @@ El sistema de service OficioYa debe tener:
 | **Precondiciones** | Para que el sistema cumpla con este requerimiento, la solicitud ya debe haber sido aceptada, faltan menos de 24 horas para que se realice el trabajo. |
 | **Actor** | Contratante y trabajador |
 | **Flujo principal** | 1. El contratante revisa los trabajos abiertos.<br>2. El contratante escoge un trabajo que se realiza en menos de 24 horas.<br>3. El contrantante cancela el trabajo.<br>4. El sistema verifica si faltan menos de 24 horas para el trabajo.<br>5. El sistema comprueba que faltan menos de 24 horas para el trabajo.<br>6. El sistema bloquea al contrantante de poder enviar una solicitud al trabajador que le canceló el trabajo.<br>7. El sistema le envía una notificación al trabajador de que el trabajo fue cancelado. |
-| **Diagrama de caso de uso** | ![Diagrama caso uso - 10](../images/DCU-REQ-SRV-0010) |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 10](../images/DCU-REQ-SRV-010.png) |
 | **Poscondiciones** | Se espera como resultado el bloqueo del contratante para enviarle una solicitud de nuevo al mismo trabajador dentro de una semana, la solicitud en estado cancelada y la notificación enviada al trabajador. |
 
 ### 2.11 Requerimiento Funcional 11
@@ -180,7 +180,7 @@ El sistema de service OficioYa debe tener:
 | **Precondiciones** | Para que el sistema cumpla con este requerimiento, la solicitud ya debe haber sido aceptada, faltan menos de 24 horas para que se realice el trabajo. |
 | **Actor** | Contratante y trabajador |
 | **Flujo principal** | 1. El trabajador revisa los trabajos pendientes.<br>2. El trabajador escoge un trabajo que se realiza en menos de 24 horas.<br>3. El trabajador cancela el trabajo.<br>4. El sistema verifica si faltan menos de 24 horas para el trabajo.<br>5. El sistema comprueba que faltan menos de 24 horas para el trabajo.<br>6. El sistema resta 0,5 puntos de la reputación del trabajador.<br>7. El sistema le envía una notificación al contratante de que el trabajo fue cancelado. |
-| **Diagrama de caso de uso** | ![Diagrama caso uso - 11](../images/DCU-REQ-SRV-0011) |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 11](../images/DCU-REQ-SRV-011.png) |
 | **Poscondiciones** | Se espera como resultado el trabajador con una reputación con 0,5 puntos menos y la notificación enviada al contratante. |
 
 ### 2.12 Requerimiento Funcional 12
@@ -193,5 +193,5 @@ El sistema de service OficioYa debe tener:
 | **Precondiciones** | Para que el sistema cumpla con este requerimiento, el usuario debe de haber iniciado sesión. |
 | **Actor** | Contratante y trabajador |
 | **Flujo principal** | 1. El contratante o trabajador van a su propio perfil.<br>2. El contratante o trabajador escoge la opción de ver sus solicitudes.<br>3. El sistema filtra las solicitudes que se pueden ver (todas menos las eliminadas).<br>4. El sistema le muestra las solicitudes al usuario que las está revisando. |
-| **Diagrama de caso de uso** | ![Diagrama caso uso - 12](../images/DCU-REQ-SRV-0012) |
+| **Diagrama de caso de uso** | ![Diagrama caso uso - 12](../images/DCU-REQ-SRV-012.png) |
 | **Poscondiciones** | Se espera como resultado que se puedan ver todas las solicitudes realizadas y que no se muestren las eliminadas. |

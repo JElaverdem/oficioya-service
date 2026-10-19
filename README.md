@@ -22,7 +22,7 @@
 
 ## Mock Up
 
-![Mock Up Creacion Solicitud](/src/main/resources/docs/images/MockUp-CreacionSolicitud)
-![Mock Up Escoger Trabajadores](/src/main/resources/docs/images/MockUp-EscogerTrabajadores)
-![Mock Up Confirmar Envio](/src/main/resources/docs/images/MockUp-ConfirmarEnvio)
-![Mock Up Solicitud Enviada](/src/main/resources/docs/images/MockUp-SolicitudEnviada)
+![Mock Up Creacion Solicitud](/src/main/resources/docs/images/MockUp-CreacionSolicitud.png)
+![Mock Up Escoger Trabajadores](/src/main/resources/docs/images/MockUp-EscogerTrabajadores.png)
+![Mock Up Confirmar Envio](/src/main/resources/docs/images/MockUp-ConfirmarEnvio.png)
+![Mock Up Solicitud Enviada](/src/main/resources/docs/images/MockUp-SolicitudEnviada.png)
