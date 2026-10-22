@@ -6,6 +6,7 @@ import java.util.UUID;
 import jakarta.persistence.*;
 
 @Entity 
+@Table(name = "Cancellations")
 public class Cancellation {
     @Id 
     private UUID id;

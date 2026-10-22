@@ -6,6 +6,7 @@ import edu.eci.dosw.oficioya.oficioya_service.model.RequestState;
 import jakarta.persistence.*;
 
 @Entity 
+@Table(name = "Requests")
 public class Request {
     @Id
     private UUID id;
