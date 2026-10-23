@@ -22,7 +22,14 @@
 
 ## Mock Up
 
-![Mock Up Creacion Solicitud](/src/main/resources/docs/images/MockUp-CreacionSolicitud.png)
-![Mock Up Escoger Trabajadores](/src/main/resources/docs/images/MockUp-EscogerTrabajadores.png)
-![Mock Up Confirmar Envio](/src/main/resources/docs/images/MockUp-ConfirmarEnvio.png)
-![Mock Up Solicitud Enviada](/src/main/resources/docs/images/MockUp-SolicitudEnviada.png)
+### Link
+[Link del figma](https://www.figma.com/make/wy8eVjfR1SbrWb3wUqMIkM/Sistema-de-calificaci%C3%B3n-5-estrellas?t=FlzxIc07XaISpXqc-20&fullscreen=1)
+
+### Fotos
+![1. Rellenar datos](/src/main/resources/docs/images/1.Rellenar%20datos.png)
+![1. Escoger trabajadores](/src/main/resources/docs/images/1.Escoger%20trabajadores.png)
+![1. Confirmar datos](/src/main/resources/docs/images/1.Confirmar%20datos.png)
+![1. Solicitud enviada](/src/main/resources/docs/images/1.Solicitud%20enviada.png)
+![2. Rellenar datos](/src/main/resources/docs/images/2.Rellenar%20datos.png)
+![2. Confirmar datos](/src/main/resources/docs/images/2.Confirmar%20datos.png)
+![2. Solicitud enviada](/src/main/resources/docs/images/2.Solicitud%20enviada.png)
