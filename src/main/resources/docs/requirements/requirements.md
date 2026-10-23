@@ -37,6 +37,7 @@ El sistema de service OficioYa debe tener:
 3. Si una solicitud se envia a multiples trabajadores, el sistema debe crearla como solicitudes independientes para cada trabajador.
 4. Al revisar el historial de solicitudes Aparecen con el nombre del contratante si es una solicitud a un trabajador o el nombre del trabajador si es una solicitud que hizo el contratante, el día y hora a la que se va a realizar o se realizó el trabajo y el estado en el que está.
 5. Al revisar el historial de solicitudes no aparecen las solicitudes eliminadas lógicamente.
+6. Cuando una solicitud es creada, enviada y modificada se le llama solicitud, cuando la solicitud pasa a ser aceptada, se le llama un 'Trabajo' dentro de los requerimientos.
 
 ## 2. Diagramas de caso de uso
 
