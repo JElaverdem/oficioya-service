@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 public class RequestModel {
     private UUID id;
+    private UUID rootId;
     private UUID contractorId;
     private UUID workerId;
     private String description;
@@ -16,7 +17,9 @@ public class RequestModel {
     private String exactAddress;
     private LocalDateTime scheduledDateTime;
     private RequestState state;
-    private LocalDateTime dateTimeCreated;
+    private LocalDateTime dateCreated;
+    private LocalDateTime cancellationDateTime;
+    private CancellationState cancellationState;
 
     public RequestModel(){
 
@@ -28,6 +31,14 @@ public class RequestModel {
 
     public UUID getId(){
         return this.id;
+    }
+
+    public void setRootId(UUID newId){
+        this.id = newId;
+    }
+
+    public UUID getRootId(){
+        return this.rootId;
     }
 
     public void setContractorId(UUID newId){
@@ -86,11 +97,27 @@ public class RequestModel {
         return this.state;
     }
 
-    public void setDateTimeCreated(LocalDateTime newDate){
-        this.dateTimeCreated = newDate;
+    public void setDateCreated(LocalDateTime newDate){
+        this.dateCreated = newDate;
     }
 
-    public LocalDateTime getDateTimeCreated(){
-        return this.dateTimeCreated;
+    public LocalDateTime getDateCreated(){
+        return this.dateCreated;
+    }
+    
+    public void setCancellationDateTime(LocalDateTime cancellationDateTime) {
+        this.cancellationDateTime = cancellationDateTime;
+    }
+
+    public LocalDateTime getCancellationDateTime() {
+    return this.cancellationDateTime;
+    }
+
+    public void setCancellationState(CancellationState cancellationState) {
+        this.cancellationState = cancellationState;
+    }
+
+    public CancellationState getCancellationState() {
+        return this.cancellationState;
     }
 }
