@@ -1,39 +1,37 @@
 <mxfile host="app.diagrams.net">
   <diagram name="Página-1" id="0sZQcBnF1z5MDbTKO573">
-    <mxGraphModel dx="1386" dy="1973" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="RS" parent="1" style="html=1;whiteSpace=wrap;overflow=fill;verticalAlign=top;fillColor=#161b22;strokeColor=#4b5563;fontColor=#e5e7eb;" value="&lt;table width=&quot;100%&quot; cellpadding=&quot;4&quot; cellspacing=&quot;0&quot; style=&quot;color: rgb(229, 231, 235); font-size: 12px;&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td colspan=&quot;3&quot; align=&quot;center&quot; bgcolor=&quot;#7e22ce&quot;&gt;&lt;font color=&quot;#fff&quot; style=&quot;font-size: 14px;&quot;&gt;&lt;i&gt;«enum»&lt;/i&gt;&lt;br&gt;&lt;b&gt;RequestState&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#facc15&quot;&gt;&lt;b&gt;PK&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;&lt;u&gt;&lt;b&gt;nameState&lt;/b&gt;&lt;/u&gt;&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;varchar(10)&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;PENDING&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;ACCEPTED&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;CONFLICT&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;CANCELED&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;REJECTED&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;COMPLETED&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;EXPIRED&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;br&gt;&lt;/td&gt;&lt;td&gt;DELETED&lt;/td&gt;&lt;td&gt;&lt;br&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;" vertex="1">
           <mxGeometry height="250" width="300" x="370" y="-270" as="geometry" />
         </mxCell>
-        <mxCell id="RQ" parent="1" style="html=1;whiteSpace=wrap;overflow=fill;verticalAlign=top;fillColor=#161b22;strokeColor=#4b5563;fontColor=#e5e7eb;" value="&lt;table width=&quot;100%&quot; cellpadding=&quot;4&quot; cellspacing=&quot;0&quot; style=&quot;color: rgb(229, 231, 235); font-size: 12px;&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td colspan=&quot;3&quot; align=&quot;center&quot; bgcolor=&quot;#1d4ed8&quot;&gt;&lt;font color=&quot;#fff&quot; style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;Request&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#facc15&quot;&gt;&lt;b&gt;PK&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;&lt;u&gt;&lt;b&gt;id&lt;/b&gt;&lt;/u&gt;&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;Long NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;b style=&quot;color: rgb(34, 211, 238);&quot;&gt;FK1&lt;/b&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;contractorId&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;Long NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;b style=&quot;color: rgb(34, 211, 238);&quot;&gt;FK2&lt;/b&gt;&lt;/td&gt;&lt;td&gt;workerId&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;Long NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;br&gt;&lt;/td&gt;&lt;td&gt;description&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;varchar(400) NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;photoUrl&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;varchar(300) NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;neighborhood&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;varchar(50) NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;exactAddress&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;varchar(100) NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;scheduledDateTime&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;TIMESTAMP NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;FK3&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;state&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;varchar(10) NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;br&gt;&lt;/td&gt;&lt;td&gt;dateCreated&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;TIMESTAMP NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;" vertex="1">
-          <mxGeometry height="260" width="380" x="780" y="-270" as="geometry" />
+        <mxCell id="RQ" parent="1" style="html=1;whiteSpace=wrap;overflow=fill;verticalAlign=top;fillColor=#161b22;strokeColor=#4b5563;fontColor=#e5e7eb;" value="&lt;table width=&quot;100%&quot; cellpadding=&quot;4&quot; cellspacing=&quot;0&quot; style=&quot;color: rgb(229, 231, 235); font-size: 12px;&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td colspan=&quot;3&quot; align=&quot;center&quot; bgcolor=&quot;#1d4ed8&quot;&gt;&lt;font color=&quot;#fff&quot; style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;Request&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#facc15&quot;&gt;&lt;b&gt;PK&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;&lt;u&gt;&lt;b&gt;id&lt;/b&gt;&lt;/u&gt;&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;UUID NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;b style=&quot;color: rgb(34, 211, 238);&quot;&gt;FK1&lt;/b&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;contractorId&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;UUID NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;b style=&quot;color: rgb(34, 211, 238);&quot;&gt;FK2&lt;/b&gt;&lt;/td&gt;&lt;td&gt;workerId&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;UUID NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;br&gt;&lt;/td&gt;&lt;td&gt;description&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;varchar(400) NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;photoUrl&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;varchar(300) NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;neighborhood&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;varchar(50) NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;exactAddress&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;varchar(100) NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;b style=&quot;color: rgb(34, 211, 238);&quot;&gt;FK3&lt;/b&gt;&lt;/td&gt;&lt;td&gt;scheduledDateTime&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;TIMESTAMP NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;FK4&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;state&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;varchar(10) NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;br&gt;&lt;/td&gt;&lt;td&gt;dateCreated&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;TIMESTAMP NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;br&gt;&lt;/td&gt;&lt;td&gt;cancellationDateTime&lt;/td&gt;&lt;td&gt;&lt;span style=&quot;color: rgb(156, 163, 175);&quot;&gt;TIMESTAMP&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;b style=&quot;color: rgb(34, 211, 238);&quot;&gt;FK5&lt;/b&gt;&lt;/td&gt;&lt;td&gt;cancellationState&lt;/td&gt;&lt;td&gt;&lt;span style=&quot;color: rgb(156, 163, 175);&quot;&gt;varchar(11)&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;br&gt;&lt;/td&gt;&lt;td&gt;rootId&lt;/td&gt;&lt;td&gt;&lt;span style=&quot;color: rgb(156, 163, 175);&quot;&gt;UUID NOT NULL&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="320" width="380" x="780" y="-270" as="geometry" />
         </mxCell>
-        <mxCell id="US" parent="1" style="html=1;whiteSpace=wrap;overflow=fill;verticalAlign=top;fillColor=#161b22;strokeColor=#4b5563;fontColor=#e5e7eb;" value="&lt;table width=&quot;100%&quot; cellpadding=&quot;4&quot; cellspacing=&quot;0&quot; style=&quot;color: rgb(229, 231, 235); font-size: 12px;&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td colspan=&quot;3&quot; align=&quot;center&quot; bgcolor=&quot;#4b5563&quot;&gt;&lt;font color=&quot;#fff&quot; style=&quot;font-size: 14px;&quot;&gt;&lt;i&gt;«dominio Usuario»&lt;/i&gt;&lt;br&gt;&lt;b&gt;User&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#facc15&quot;&gt;&lt;b&gt;PK&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;&lt;u&gt;&lt;b&gt;id&lt;/b&gt;&lt;/u&gt;&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;Long NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;" vertex="1">
+        <mxCell id="US" parent="1" style="html=1;whiteSpace=wrap;overflow=fill;verticalAlign=top;fillColor=#161b22;strokeColor=#4b5563;fontColor=#e5e7eb;" value="&lt;table width=&quot;100%&quot; cellpadding=&quot;4&quot; cellspacing=&quot;0&quot; style=&quot;color: rgb(229, 231, 235); font-size: 12px;&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td colspan=&quot;3&quot; align=&quot;center&quot; bgcolor=&quot;#4b5563&quot;&gt;&lt;font color=&quot;#fff&quot; style=&quot;font-size: 14px;&quot;&gt;&lt;i&gt;«dominio Usuario»&lt;/i&gt;&lt;br&gt;&lt;b&gt;User&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#facc15&quot;&gt;&lt;b&gt;PK&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;&lt;u&gt;&lt;b&gt;id&lt;/b&gt;&lt;/u&gt;&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;UUID NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;" vertex="1">
           <mxGeometry height="68" width="380" x="1280" y="-240" as="geometry" />
         </mxCell>
-        <mxCell id="BL" parent="1" style="html=1;whiteSpace=wrap;overflow=fill;verticalAlign=top;fillColor=#161b22;strokeColor=#4b5563;fontColor=#e5e7eb;" value="&lt;table width=&quot;100%&quot; cellpadding=&quot;4&quot; cellspacing=&quot;0&quot; style=&quot;color: rgb(229, 231, 235); font-size: 12px;&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td colspan=&quot;3&quot; align=&quot;center&quot; bgcolor=&quot;#1d4ed8&quot;&gt;&lt;font color=&quot;#ffffff&quot;&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;Cancellation&lt;/b&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#facc15&quot;&gt;&lt;b&gt;PK&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;&lt;u&gt;&lt;b&gt;id&lt;/b&gt;&lt;/u&gt;&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;Long NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;FK1&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;contractorId&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;Long NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;FK2&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;workerId&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;Long NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;cancellationDateTime&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;TIMESTAMP NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;" vertex="1">
-          <mxGeometry height="120" width="360" x="1350" y="-130" as="geometry" />
-        </mxCell>
-        <mxCell id="Gym0UjnJfmYzbZCym_6w-2" edge="1" parent="1" source="RS" style="edgeStyle=orthogonalEdgeStyle;html=1;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;strokeColor=default;fontColor=default;labelBackgroundColor=#0f1117;entryX=-0.003;entryY=0.834;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="RQ" value="">
-          <mxGeometry relative="1" x="0.1216" as="geometry">
+        <mxCell id="Gym0UjnJfmYzbZCym_6w-2" edge="1" parent="1" source="RS" style="edgeStyle=orthogonalEdgeStyle;html=1;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;strokeColor=default;fontColor=default;labelBackgroundColor=#0f1117;entryX=0.006;entryY=0.657;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="RQ" value="">
+          <mxGeometry relative="1" x="0.424" as="geometry">
             <Array as="points">
               <mxPoint x="720" y="-145" />
-              <mxPoint x="720" y="-53.2" />
+              <mxPoint x="720" y="-60" />
+              <mxPoint x="750" y="-60" />
             </Array>
             <mxPoint x="760" y="-170" as="sourcePoint" />
             <mxPoint x="610" y="-57" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="Gym0UjnJfmYzbZCym_6w-5" connectable="0" parent="Gym0UjnJfmYzbZCym_6w-2" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="1" vertex="1">
-          <mxGeometry relative="1" x="-0.8904" as="geometry">
+          <mxGeometry relative="1" x="-0.8581" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="Gym0UjnJfmYzbZCym_6w-6" connectable="0" parent="Gym0UjnJfmYzbZCym_6w-2" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="*" vertex="1">
-          <mxGeometry relative="1" x="0.814" as="geometry">
-            <mxPoint x="-10" as="offset" />
+          <mxGeometry relative="1" x="0.4619" as="geometry">
+            <mxPoint x="31" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="Gym0UjnJfmYzbZCym_6w-3" edge="1" parent="1" source="US" style="edgeStyle=orthogonalEdgeStyle;html=1;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;strokeColor=default;fontColor=#e5e7eb;labelBackgroundColor=#0f1117;entryX=1.004;entryY=0.232;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0;exitY=0.446;exitDx=0;exitDy=0;exitPerimeter=0;" target="RQ" value="">
@@ -69,45 +67,46 @@
             <mxPoint x="20" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="Gym0UjnJfmYzbZCym_6w-11" edge="1" parent="1" source="US" style="edgeStyle=orthogonalEdgeStyle;html=1;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;strokeColor=default;fontColor=#e5e7eb;labelBackgroundColor=#0f1117;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="BL" value="">
-          <mxGeometry relative="1" x="0.0181" as="geometry">
+        <mxCell id="jqmYag45FuRgHB7U05ly-1" parent="1" style="html=1;whiteSpace=wrap;overflow=fill;verticalAlign=top;fillColor=#161b22;strokeColor=#4b5563;fontColor=#e5e7eb;" value="&lt;table width=&quot;100%&quot; cellpadding=&quot;4&quot; cellspacing=&quot;0&quot; style=&quot;color: rgb(229, 231, 235); font-size: 12px;&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td colspan=&quot;3&quot; align=&quot;center&quot; bgcolor=&quot;#4b5563&quot;&gt;&lt;font color=&quot;#fff&quot; style=&quot;font-size: 14px;&quot;&gt;&lt;i&gt;«dominio Usuario»&lt;/i&gt;&lt;br&gt;&lt;b&gt;Worker&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#facc15&quot;&gt;&lt;b&gt;PK&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;&lt;u&gt;&lt;b&gt;id&lt;/b&gt;&lt;/u&gt;&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;UUID NOT NULL&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;br&gt;&lt;/td&gt;&lt;td&gt;timeSlot&lt;/td&gt;&lt;td&gt;&lt;span style=&quot;color: rgb(156, 163, 175);&quot;&gt;TIMESTAMP&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="90" width="380" x="1280" y="-150" as="geometry" />
+        </mxCell>
+        <mxCell id="jqmYag45FuRgHB7U05ly-3" edge="1" parent="1" source="jqmYag45FuRgHB7U05ly-1" style="edgeStyle=orthogonalEdgeStyle;html=1;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;strokeColor=default;fontColor=#e5e7eb;labelBackgroundColor=#0f1117;entryX=1;entryY=0.608;entryDx=0;entryDy=0;entryPerimeter=0;exitX=-0.001;exitY=0.845;exitDx=0;exitDy=0;exitPerimeter=0;" target="RQ" value="">
+          <mxGeometry relative="1" x="-0.4129" as="geometry">
+            <mxPoint x="1340" y="-110" as="sourcePoint" />
+            <mxPoint x="1220" y="-92" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jqmYag45FuRgHB7U05ly-4" connectable="0" parent="jqmYag45FuRgHB7U05ly-3" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="1" vertex="1">
+          <mxGeometry relative="1" x="0.5608" y="1" as="geometry">
+            <mxPoint x="-6" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jqmYag45FuRgHB7U05ly-5" connectable="0" parent="jqmYag45FuRgHB7U05ly-3" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="1" vertex="1">
+          <mxGeometry relative="1" x="-0.5713" y="1" as="geometry">
+            <mxPoint x="6" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jqmYag45FuRgHB7U05ly-6" parent="1" style="html=1;whiteSpace=wrap;overflow=fill;verticalAlign=top;fillColor=#161b22;strokeColor=#4b5563;fontColor=#e5e7eb;" value="&lt;table width=&quot;100%&quot; cellpadding=&quot;4&quot; cellspacing=&quot;0&quot; style=&quot;color: rgb(229, 231, 235); font-size: 12px;&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td colspan=&quot;3&quot; align=&quot;center&quot; bgcolor=&quot;#7e22ce&quot;&gt;&lt;font color=&quot;#fff&quot; style=&quot;font-size: 14px;&quot;&gt;&lt;i&gt;«enum»&lt;/i&gt;&lt;br&gt;&lt;b&gt;CancellationState&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#facc15&quot;&gt;&lt;b&gt;PK&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;&lt;u&gt;&lt;b&gt;nameState&lt;/b&gt;&lt;/u&gt;&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;varchar(11)&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;IN_PROGRESS&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=&quot;36&quot;&gt;&lt;font color=&quot;#22d3ee&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;&lt;td&gt;COMPLETED&lt;/td&gt;&lt;td&gt;&lt;font color=&quot;#9ca3af&quot;&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="110" width="300" x="370" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="jqmYag45FuRgHB7U05ly-7" edge="1" parent="1" source="jqmYag45FuRgHB7U05ly-6" style="edgeStyle=orthogonalEdgeStyle;html=1;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;strokeColor=default;fontColor=default;labelBackgroundColor=#0f1117;entryX=-0.002;entryY=0.882;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" target="RQ" value="">
+          <mxGeometry relative="1" x="0.4768" as="geometry">
             <Array as="points">
-              <mxPoint x="1375" y="-140" />
-              <mxPoint x="1330" y="-140" />
-              <mxPoint x="1330" y="-70" />
+              <mxPoint x="720" y="57.5" />
+              <mxPoint x="720" y="12.2" />
             </Array>
-            <mxPoint x="1380" y="-170" as="sourcePoint" />
-            <mxPoint x="1350" y="-40" as="targetPoint" />
+            <mxPoint x="730" y="20" as="sourcePoint" />
+            <mxPoint x="842" y="105" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="Gym0UjnJfmYzbZCym_6w-12" connectable="0" parent="Gym0UjnJfmYzbZCym_6w-11" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="0..*" vertex="1">
-          <mxGeometry relative="1" x="0.1339" y="1" as="geometry">
-            <mxPoint y="32" as="offset" />
+        <mxCell id="jqmYag45FuRgHB7U05ly-8" connectable="0" parent="jqmYag45FuRgHB7U05ly-7" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="1" vertex="1">
+          <mxGeometry relative="1" x="-0.7929" as="geometry">
+            <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="Gym0UjnJfmYzbZCym_6w-13" connectable="0" parent="Gym0UjnJfmYzbZCym_6w-11" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="1" vertex="1">
-          <mxGeometry relative="1" x="-0.7006" y="1" as="geometry">
-            <mxPoint y="-4" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="Gym0UjnJfmYzbZCym_6w-14" edge="1" parent="1" source="US" style="edgeStyle=orthogonalEdgeStyle;html=1;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;strokeColor=default;fontColor=#e5e7eb;labelBackgroundColor=#0f1117;entryX=-0.005;entryY=0.672;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.08;exitY=0.997;exitDx=0;exitDy=0;exitPerimeter=0;" target="BL" value="">
-          <mxGeometry relative="1" x="-0.7049" as="geometry">
-            <Array as="points">
-              <mxPoint x="1310.4" y="-170.6" />
-              <mxPoint x="1310" y="-49.4" />
-            </Array>
-            <mxPoint x="1530" y="-38" as="sourcePoint" />
-            <mxPoint x="1320" y="-50" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="Gym0UjnJfmYzbZCym_6w-15" connectable="0" parent="Gym0UjnJfmYzbZCym_6w-14" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="0..*" vertex="1">
-          <mxGeometry relative="1" x="0.5465" y="1" as="geometry">
-            <mxPoint x="9" as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="Gym0UjnJfmYzbZCym_6w-16" connectable="0" parent="Gym0UjnJfmYzbZCym_6w-14" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="1" vertex="1">
-          <mxGeometry relative="1" x="-0.7049" y="1" as="geometry">
-            <mxPoint y="-2" as="offset" />
+        <mxCell id="jqmYag45FuRgHB7U05ly-9" connectable="0" parent="jqmYag45FuRgHB7U05ly-7" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="*" vertex="1">
+          <mxGeometry relative="1" x="0.5169" as="geometry">
+            <mxPoint x="8" as="offset" />
           </mxGeometry>
         </mxCell>
       </root>
