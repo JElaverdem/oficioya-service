@@ -1,0 +1,527 @@
+openapi: 3.0.3
+info:
+  title: OficioYa · API de solicitudes (contrato v0.2)
+  version: 0.2.0
+  description: |
+    Contrato v0.2 para que el Orchestrator y el frontend integren sin esperar el código.
+    Alineado con el diagrama de clases del servicio Request (ids `UUID`, `contractor`/`worker`,
+    `RequestState`, `CancellationState`, `rootId`).
+
+    **Reglas generales**
+    - Todos los endpoints exigen `Authorization: Bearer <JWT>`.
+    - La identidad (contratante o trabajador) sale **siempre del token**, nunca del cuerpo ni de la URL.
+    - Una solicitud ajena, inexistente o en estado `DELETED` responde `404` (no se revela que existe).
+    - Un rol que no corresponde responde `403`.
+    - Una acción sobre una solicitud `EXPIRED` responde `410`.
+    - Una transición de estado no permitida responde `409`.
+    - Todos los errores usan el mismo cuerpo (`ApiError`), sin trazas.
+
+    **Trabajo (`rootId`)**
+    Un contratante puede enviar el mismo trabajo a varios trabajadores. Se crea **una solicitud por
+    trabajador** y todas comparten el mismo `rootId`, que genera el servidor.
+
+    **Estados y transiciones**
+    ```
+    [*]      --> PENDING     (CONTRATANTE crea)
+    PENDING  --> ACCEPTED    (TRABAJADOR asignado acepta)
+    PENDING  --> REJECTED    (TRABAJADOR asignado rechaza)
+    PENDING  --> CANCELED    (CONTRATANTE cancela)
+    PENDING  --> EXPIRED     (automático)
+    ACCEPTED --> COMPLETED   (CONTRATANTE completa)
+    ACCEPTED --> CANCELED    (CONTRATANTE o TRABAJADOR asignado cancela)
+    ACCEPTED --> CONFLICT    (automático: otro trabajador del mismo rootId también acepta)
+    CONFLICT --> CANCELED    (CONTRATANTE cancela una; la otra se resuelve según la regla pendiente)
+    COMPLETED/CANCELED/REJECTED/EXPIRED --> DELETED  (borrado lógico; endpoint pendiente)
+    ```
+
+    **Cancelación en dos pasos**
+    Al cancelar, `state` pasa a `CANCELED` y `cancellationState` a `IN_PROGRESS`. Cuando se
+    terminan los efectos asociados (liberar al trabajador, reputación, notificaciones),
+    `cancellationState` pasa a `COMPLETED`.
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local
+
+tags:
+  - name: Requests
+    description: Ciclo de vida de las solicitudes de servicio
+
+security:
+  - bearerAuth: []
+
+paths:
+  /requests:
+    post:
+      tags: [Requests]
+      operationId: createRequest
+      summary: Crear un trabajo y enviarlo a uno o varios trabajadores
+      description: |
+        Solo `CONTRATANTE`. El contratante se toma del token. Se crea una solicitud `PENDING`
+        por cada trabajador de `workerIds`, todas con el mismo `rootId`. Es todo o nada:
+        si algún trabajador falla, no se crea ninguna.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRequestPayload'
+            example:
+              workerIds:
+                - 3b1f6c52-8d4e-4a07-9c15-0e7a2f9d4b61
+                - 9a24e7d0-1c3b-4f58-b6a2-5d8e0c7f3a19
+              description: Tengo una gotera en el baño
+              photoUrl: https://example.com/fotos/gotera.jpg
+              neighborhood: Chapinero
+              exactAddress: 'Calle 60 # 7-30, apto 301'
+              scheduledDateTime: '2026-11-02T09:00:00'
+      responses:
+        '201':
+          description: Trabajo creado, con una solicitud por trabajador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateRequestResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Alguno de los trabajadores no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                timestamp: '2026-10-27T10:15:30'
+                status: 404
+                error: Not Found
+                mensaje: Trabajador no encontrado
+                ruta: /api/v1/requests
+        '409':
+          description: Alguno de los trabajadores no está disponible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                timestamp: '2026-10-27T10:15:30'
+                status: 409
+                error: Conflict
+                mensaje: El trabajador no está disponible
+                ruta: /api/v1/requests
+
+  /my-requests:
+    get:
+      tags: [Requests]
+      operationId: listMyRequests
+      summary: Listar mis solicitudes
+      description: |
+        `CONTRATANTE` y `TRABAJADOR`. Devuelve solo las solicitudes en las que participa
+        el usuario autenticado, de la más reciente a la más antigua. Las `DELETED` no se incluyen.
+      parameters:
+        - name: state
+          in: query
+          required: false
+          description: Filtra por estado
+          schema:
+            $ref: '#/components/schemas/RequestState'
+        - name: rootId
+          in: query
+          required: false
+          description: Filtra las solicitudes de un mismo trabajo
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Página de solicitudes propias (vacía si no hay)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /requests/{id}/accept:
+    patch:
+      tags: [Requests]
+      operationId: acceptRequest
+      summary: Aceptar una solicitud
+      description: |
+        Solo el `TRABAJADOR` asignado. Pasa de `PENDING` a `ACCEPTED`.
+        Si otro trabajador del mismo `rootId` ya había aceptado, la respuesta es `200` con
+        `state = CONFLICT` (no es un error): el contratante debe cancelar una de las dos.
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Solicitud aceptada (`ACCEPTED`) o en conflicto (`CONFLICT`)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/InvalidState'
+        '410':
+          $ref: '#/components/responses/Expired'
+
+  /requests/{id}/reject:
+    patch:
+      tags: [Requests]
+      operationId: rejectRequest
+      summary: Rechazar una solicitud
+      description: |
+        Solo el `TRABAJADOR` asignado. Pasa de `PENDING` a `REJECTED`.
+        No estaba en el ticket original; se agrega porque el modelo ya define `REJECTED`
+        y la notificación `REJECTED_REQUEST`.
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Solicitud rechazada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/InvalidState'
+        '410':
+          $ref: '#/components/responses/Expired'
+
+  /requests/{id}/cancel:
+    patch:
+      tags: [Requests]
+      operationId: cancelRequest
+      summary: Cancelar una solicitud
+      description: |
+        - `CONTRATANTE` autor: desde `PENDING`, `ACCEPTED` o `CONFLICT`.
+        - `TRABAJADOR` asignado: solo desde `ACCEPTED` (para declinar una `PENDING` usa `reject`).
+
+        Responde con `state = CANCELED` y `cancellationState = IN_PROGRESS`; pasa a `COMPLETED`
+        cuando terminan los efectos asociados. No lleva cuerpo.
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Cancelación iniciada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/InvalidState'
+        '410':
+          $ref: '#/components/responses/Expired'
+
+  /requests/{id}/complete:
+    patch:
+      tags: [Requests]
+      operationId: completeRequest
+      summary: Completar una solicitud
+      description: Solo el `CONTRATANTE` autor. Pasa de `ACCEPTED` a `COMPLETED`.
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Solicitud completada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/InvalidState'
+        '410':
+          $ref: '#/components/responses/Expired'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    RequestId:
+      name: id
+      in: path
+      required: true
+      description: Id de la solicitud
+      schema:
+        type: string
+        format: uuid
+      example: 7d3a1f0e-5b2c-4c8e-9a41-2f6b8d0c1e55
+
+  schemas:
+    LocalDateTime:
+      type: string
+      description: Fecha y hora sin zona horaria (`LocalDateTime` de Java)
+      pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?$'
+      example: '2026-11-02T09:00:00'
+
+    RequestState:
+      type: string
+      enum: [PENDING, ACCEPTED, CONFLICT, CANCELED, REJECTED, COMPLETED, EXPIRED, DELETED]
+
+    CancellationState:
+      type: string
+      description: Avance de la cancelación; solo aplica cuando `state` es `CANCELED`
+      enum: [IN_PROGRESS, COMPLETED]
+
+    CreateRequestPayload:
+      type: object
+      description: El contratante no se envía; sale del token.
+      required: [workerIds, description, neighborhood, exactAddress, scheduledDateTime]
+      additionalProperties: false
+      properties:
+        workerIds:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          description: Trabajadores a los que se envía el trabajo (máximo por definir)
+          items:
+            type: string
+            format: uuid
+        description:
+          type: string
+          minLength: 5
+          maxLength: 500
+          description: Descripción del servicio requerido (no puede ser solo espacios)
+        photoUrl:
+          type: string
+          format: uri
+          maxLength: 2048
+          description: Foto de referencia (opcional)
+        neighborhood:
+          type: string
+          minLength: 1
+          maxLength: 100
+        exactAddress:
+          type: string
+          minLength: 5
+          maxLength: 200
+        scheduledDateTime:
+          allOf:
+            - $ref: '#/components/schemas/LocalDateTime'
+          description: Debe ser una fecha futura
+
+    ServiceRequest:
+      type: object
+      required: [id, rootId, contractorId, workerId, description, neighborhood, scheduledDateTime, state, dateCreated]
+      properties:
+        id:
+          type: string
+          format: uuid
+        rootId:
+          type: string
+          format: uuid
+          description: Agrupa las solicitudes enviadas a distintos trabajadores para un mismo trabajo
+        contractorId:
+          type: string
+          format: uuid
+        workerId:
+          type: string
+          format: uuid
+        description:
+          type: string
+        photoUrl:
+          type: string
+          nullable: true
+        neighborhood:
+          type: string
+        exactAddress:
+          type: string
+          nullable: true
+          description: |
+            Dato sensible. Regla propuesta: el contratante siempre la ve; el trabajador solo
+            cuando `state` es `ACCEPTED`, `CONFLICT` o `COMPLETED`; en otro caso es `null`.
+        scheduledDateTime:
+          $ref: '#/components/schemas/LocalDateTime'
+        state:
+          $ref: '#/components/schemas/RequestState'
+        dateCreated:
+          $ref: '#/components/schemas/LocalDateTime'
+        cancellationDateTime:
+          allOf:
+            - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
+        cancellationState:
+          allOf:
+            - $ref: '#/components/schemas/CancellationState'
+          nullable: true
+
+    CreateRequestResult:
+      type: object
+      required: [rootId, requests]
+      properties:
+        rootId:
+          type: string
+          format: uuid
+        requests:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceRequest'
+
+    RequestPage:
+      type: object
+      required: [items, page, size, totalElements]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceRequest'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+
+    ApiError:
+      type: object
+      description: Formato único de error (RS-09). No incluye trazas.
+      required: [timestamp, status, error, mensaje, ruta]
+      properties:
+        timestamp:
+          $ref: '#/components/schemas/LocalDateTime'
+        status:
+          type: integer
+        error:
+          type: string
+        mensaje:
+          type: string
+        ruta:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Datos inválidos, cuerpo ilegible, fecha pasada o parámetro mal formado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            timestamp: '2026-10-27T10:15:30'
+            status: 400
+            error: Bad Request
+            mensaje: Datos inválidos
+            ruta: /api/v1/requests
+
+    Unauthorized:
+      description: Falta el token, o es inválido, alterado o expirado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            timestamp: '2026-10-27T10:15:30'
+            status: 401
+            error: Unauthorized
+            mensaje: Token inválido o expirado
+            ruta: /api/v1/requests
+
+    Forbidden:
+      description: El rol del usuario no permite esta acción
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            timestamp: '2026-10-27T10:15:30'
+            status: 403
+            error: Forbidden
+            mensaje: No tiene permisos para esta acción
+            ruta: /api/v1/requests
+
+    NotFound:
+      description: La solicitud no existe, está `DELETED` o no pertenece al usuario (misma respuesta en todos los casos)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            timestamp: '2026-10-27T10:15:30'
+            status: 404
+            error: Not Found
+            mensaje: Solicitud no encontrada
+            ruta: /api/v1/requests/7d3a1f0e-5b2c-4c8e-9a41-2f6b8d0c1e55
+
+    InvalidState:
+      description: La transición de estado no está permitida desde el estado actual
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            timestamp: '2026-10-27T10:15:30'
+            status: 409
+            error: Conflict
+            mensaje: La solicitud no se puede modificar en su estado actual
+            ruta: /api/v1/requests/7d3a1f0e-5b2c-4c8e-9a41-2f6b8d0c1e55/accept
+
+    Expired:
+      description: La solicitud ya expiró (`EXPIRED`) y no admite más acciones
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            timestamp: '2026-10-27T10:15:30'
+            status: 410
+            error: Gone
+            mensaje: La solicitud ha expirado
+            ruta: /api/v1/requests/7d3a1f0e-5b2c-4c8e-9a41-2f6b8d0c1e55/accept
