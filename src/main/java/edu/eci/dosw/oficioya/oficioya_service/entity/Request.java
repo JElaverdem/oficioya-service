@@ -2,6 +2,8 @@ package edu.eci.dosw.oficioya.oficioya_service.entity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import edu.eci.dosw.oficioya.oficioya_service.model.CancellationState;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestState;
 import jakarta.persistence.*;
 
@@ -10,6 +12,9 @@ import jakarta.persistence.*;
 public class Request {
     @Id
     private UUID id;
+
+    @Column (name = "root_id", nullable = false)
+    private UUID rootId;
 
     @Column (name = "contractor_id", nullable = false)
     private UUID contractorId;
@@ -34,7 +39,13 @@ public class Request {
     private RequestState state;
 
     @Column (name = "date_created", nullable = false)
-    private LocalDateTime dateTimeCreated;
+    private LocalDateTime dateCreated;
+
+    @Column (name = "cancellation_date_time", nullable = true)
+    private LocalDateTime cancellationDateTime;
+
+    @Enumerated(EnumType.STRING)
+    private CancellationState cancellationState;
 
     public Request(){
 
@@ -46,6 +57,14 @@ public class Request {
 
     public UUID getId(){
         return this.id;
+    }
+
+    public void setRootId(UUID newId){
+        this.id = newId;
+    }
+
+    public UUID getRootId(){
+        return this.rootId;
     }
 
     public void setContractorId(UUID newId){
@@ -104,11 +123,27 @@ public class Request {
         return this.state;
     }
 
-    public void setDateTimeCreated(LocalDateTime newDate){
-        this.dateTimeCreated = newDate;
+    public void setDateCreated(LocalDateTime newDate){
+        this.dateCreated = newDate;
     }
 
-    public LocalDateTime getDateTimeCreated(){
-        return this.dateTimeCreated;
+    public LocalDateTime getDateCreated(){
+        return this.dateCreated;
+    }
+    
+    public void setCancellationDateTime(LocalDateTime cancellationDateTime) {
+        this.cancellationDateTime = cancellationDateTime;
+    }
+
+    public LocalDateTime getCancellationDateTime() {
+    return this.cancellationDateTime;
+    }
+
+    public void setCancellationState(CancellationState cancellationState) {
+        this.cancellationState = cancellationState;
+    }
+
+    public CancellationState getCancellationState() {
+        return this.cancellationState;
     }
 }
