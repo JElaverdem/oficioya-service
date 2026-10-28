@@ -24,7 +24,6 @@ public class Request {
     
     @Column (nullable = false)
     private String description;
-    private String photoUrl;
 
     @Column (nullable = false)
     private String neighborhood;
@@ -60,7 +59,7 @@ public class Request {
     }
 
     public void setRootId(UUID newId){
-        this.id = newId;
+        this.rootId = newId;
     }
 
     public UUID getRootId(){

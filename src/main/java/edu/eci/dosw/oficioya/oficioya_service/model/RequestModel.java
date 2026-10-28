@@ -2,8 +2,6 @@ package edu.eci.dosw.oficioya.oficioya_service.model;
 
 import java.util.UUID;
 
-import org.springframework.cglib.core.Local;
-
 import java.time.LocalDateTime;
 
 public class RequestModel {
@@ -12,7 +10,6 @@ public class RequestModel {
     private UUID contractorId;
     private UUID workerId;
     private String description;
-    private String photoUrl;
     private String neighborhood;
     private String exactAddress;
     private LocalDateTime scheduledDateTime;
@@ -34,7 +31,7 @@ public class RequestModel {
     }
 
     public void setRootId(UUID newId){
-        this.id = newId;
+        this.rootId = newId;
     }
 
     public UUID getRootId(){
