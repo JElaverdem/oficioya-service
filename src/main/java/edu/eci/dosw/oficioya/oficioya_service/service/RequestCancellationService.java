@@ -33,7 +33,7 @@ public class RequestCancellationService {
         if (request.getState() == RequestState.ACCEPTED && request.getScheduledDateTime() != null) {
             LocalDateTime limit = request.getScheduledDateTime().minusHours(24);
             if (LocalDateTime.now().isAfter(limit)) {
-                throw new RuntimeException("Debe cancelarse al menos 24 horas antes del servicio");
+                throw new RuntimeException(" ESTE ES UN TEXTO PROVICION PQ AÚN NO SABEMOS COMO CONECTARNOS CON EL OTRO MICROSERVICIO");
             }
         }
         request.setState(RequestState.CANCELED);
@@ -56,7 +56,7 @@ public class RequestCancellationService {
         if (request.getState() == RequestState.ACCEPTED && request.getScheduledDateTime() != null) {
             LocalDateTime limit = request.getScheduledDateTime().minusHours(24);
             if (LocalDateTime.now().isAfter(limit)) {
-                throw new RuntimeException("Debe cancelarse al menos 24 horas antes del servicio");
+                throw new RuntimeException(" ESTE ES UN TEXTO PROVICION PQ AÚN NO SABEMOS COMO CONECTARNOS CON EL OTRO MICROSERVICIO");
             }
         }
         request.setState(RequestState.CANCELED);

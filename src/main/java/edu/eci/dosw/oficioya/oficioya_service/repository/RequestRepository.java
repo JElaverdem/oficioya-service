@@ -28,9 +28,6 @@ public interface RequestRepository extends JpaRepository<Request, UUID> {
 
     List<Request> findByStateAndDateCreatedBefore(RequestState state, LocalDateTime dateTime);
 
-    @Query("SELECT r FROM Request r WHERE r.id = :id")
-    Optional<Request> findRequestById(@Param("id") UUID id);
-
     @Query("""
     SELECT r FROM Request r
     WHERE r.contractorId = :contractorId
