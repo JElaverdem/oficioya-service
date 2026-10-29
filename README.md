@@ -12,6 +12,20 @@
 | **Lider Técnico** | Juan Esteban Laverde |
 | **Equipo de Desarrollo** | Brian Fierro, Diego Mesa |
 
+## Stack
+
+| Capa | Tecnología |
+|---|---|
+| Lenguaje | Java 21 |
+| Framework | Spring Boot (Web, Data JPA, Validation, Security) |
+| Build | Maven |
+| Base de datos relacional | PostgreSQL 17 |
+| Base de datos documental | MongoDB 8 |
+| Contenedores | Docker y Docker Compose |
+| Contrato de API | OpenAPI 3.0.3 |
+
+Organización por capas: `controller` → `service` → `repository` → `entity`, con `mapper` y DTO de entrada y salida separados de las entidades.
+
 ## Diagrama entidad-relación
 
 ![ER Service](/src/main/resources/docs/uml/ER-Service.png)
