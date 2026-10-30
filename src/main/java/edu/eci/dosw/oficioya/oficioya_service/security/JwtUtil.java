@@ -2,6 +2,7 @@ package edu.eci.dosw.oficioya.oficioya_service.security;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
@@ -27,10 +28,10 @@ public class JwtUtil {
         this.ttlMinutes = ttlMinutes;
     }
 
-    public String generateToken(String correo, String rol) {
+    public String generateToken(UUID userId, String rol) {
         java.time.Instant ahora = java.time.Instant.now();
         return Jwts.builder()
-                .subject(correo)
+                .subject(userId.toString())
                 .claim("role", rol)
                 .issuer(issuer)
                 .issuedAt(Date.from(ahora))
@@ -46,6 +47,10 @@ public class JwtUtil {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public UUID extractUserId(String token) {
+        return UUID.fromString(validateToken(token).getSubject());
     }
 
     public String extractUsername(String token) {
