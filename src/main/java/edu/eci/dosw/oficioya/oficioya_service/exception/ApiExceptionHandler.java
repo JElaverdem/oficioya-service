@@ -38,6 +38,12 @@ public class ApiExceptionHandler {
                 ApiError.of(404, "Not Found", ex.getMessage(), req.getRequestURI()));
     }
 
+    @ExceptionHandler(TransicionInvalidaException.class)
+    public ResponseEntity<ApiError> transicionInvalida(TransicionInvalidaException ex, HttpServletRequest req) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiError.of(409, "Conflict", ex.getMessage(), req.getRequestURI()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> datosInvalidos(MethodArgumentNotValidException ex, HttpServletRequest req) {
         return ResponseEntity.badRequest().body(
