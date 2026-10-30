@@ -24,6 +24,12 @@ public interface RequestRepository extends JpaRepository<Request, UUID> {
 
     List<Request> findByRootId(UUID rootId);
     
+    List<Request> findByContractorIdOrWorkerId(UUID contractorId, UUID workerId);
+
+    List<Request> findByWorkerIdAndState(UUID workerId, RequestState state);
+
+    List<Request> findByRootIdAndState(UUID rootId, RequestState state);
+    
     List<Request> findByStateAndDateCreatedBefore(RequestState state, LocalDateTime dateTime);
 
    
