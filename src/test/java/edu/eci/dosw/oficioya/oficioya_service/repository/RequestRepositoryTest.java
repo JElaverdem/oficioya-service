@@ -81,7 +81,7 @@ public class RequestRepositoryTest {
 
     @Test 
     @DisplayName("Debe salvar y consultar solicitudes provenientes de la 'misma pasarela'")
-    void shouldSaveAndFindRequestsFromSameRoo(){
+    void shouldSaveAndFindRequestsFromSameRoot(){
         Request r2 = new Request();
         UUID r2Id = UUID.randomUUID();
         UUID r2Root = r1.getRootId();
@@ -236,5 +236,177 @@ public class RequestRepositoryTest {
         assertFalse(changedList.contains(saved2));
 
         assertEquals(changedList.size(),1);
+    }
+
+    @Test 
+    @DisplayName("Debe hacer modificaciones de estado")
+    void shouldModifyState(){
+        Request saved = requestRepo.save(r1);
+        RequestState requestState = saved.getState();
+
+        Optional<Request> foundOptional = requestRepo.findById(saved.getId());
+        assertFalse(foundOptional.isEmpty());
+
+        Request found = foundOptional.orElse(null);
+        assertNotNull(found);
+
+        found.setState(RequestState.REJECTED);
+
+        Request saved2 = requestRepo.save(found);
+
+        foundOptional = requestRepo.findById(saved2.getId());
+        assertFalse(foundOptional.isEmpty());
+        found = foundOptional.orElse(null);
+
+        assertEquals(saved2.getId(),found.getId());
+        assertEquals(found.getId(), saved.getId());
+        assertNotEquals(found.getState(), requestState);
+        assertEquals(found.getDateCreated(),saved.getDateCreated());
+        assertEquals(found.getExactAddress(),saved.getExactAddress());
+        assertEquals(found.getScheduledDateTime(),saved.getScheduledDateTime());
+    }
+
+    @Test 
+    @DisplayName("Debe filtrar estado en query personalizada")
+    void shouldFilterByStateNot(){
+        Request r2 = new Request();
+        UUID r2Id = UUID.randomUUID();
+        UUID r2Root = r1.getRootId();
+        UUID r2Contractor = r1.getContractorId();
+        UUID r2Worker = UUID.randomUUID();
+        String description = "Reparar una gotera";
+        String neighborhood = "Niza Antigua";
+        String exactAddress = "Cra. 70a # 118-33";
+        LocalDateTime scheduledDateTime = LocalDateTime.now();
+        RequestState state = RequestState.REJECTED;
+        LocalDateTime dateCreated = LocalDateTime.now();
+        LocalDateTime cancellationDateTime = null;
+        CancellationState cancellationState = null;
+        
+        r2.setId(r2Id);
+        r2.setRootId(r2Root);
+        r2.setContractorId(r2Contractor);
+        r2.setWorkerId(r2Worker);
+        r2.setDescription(description);
+        r2.setNeighborhood(neighborhood);
+        r2.setExactAddress(exactAddress);
+        r2.setScheduledDateTime(scheduledDateTime);
+        r2.setState(state);
+        r2.setDateCreated(dateCreated);
+        r2.setCancellationDateTime(cancellationDateTime);
+        r2.setCancellationState(cancellationState);
+
+        Request r1Saved = requestRepo.save(r1);
+        Request r2Saved = requestRepo.save(r2);
+
+        List<Request> completeList = requestRepo.findAllRequestsForUser(r1.getContractorId());
+        List<Request> filteredList = requestRepo.findAllRequestsForUserAndStateNot(r1.getContractorId(), RequestState.REJECTED);
+
+        assertEquals(completeList.size(),2);
+        assertEquals(filteredList.size(),1);
+
+        assertTrue(completeList.contains(r1Saved));
+        assertTrue(completeList.contains(r2Saved));
+
+        assertTrue(filteredList.contains(r1Saved));
+        assertFalse(filteredList.contains(r2Saved));
+    }
+
+    @Test 
+    @DisplayName("Debe mostrar todas las solicitudes de un usuario, incluso si es trabajador y contratante")
+    void shouldShowAllRequestsEvenIfUserIsWorkerAndContractor(){
+        Request r2 = new Request();
+        UUID r2Id = UUID.randomUUID();
+        UUID r2Root = UUID.randomUUID();
+        UUID r2Contractor = UUID.randomUUID();
+        UUID r2Worker = r1.getContractorId();
+        String description = "Reparar una gotera";
+        String neighborhood = "Niza Antigua";
+        String exactAddress = "Cra. 70a # 118-33";
+        LocalDateTime scheduledDateTime = LocalDateTime.now();
+        RequestState state = RequestState.REJECTED;
+        LocalDateTime dateCreated = LocalDateTime.now();
+        LocalDateTime cancellationDateTime = null;
+        CancellationState cancellationState = null;
+        
+        r2.setId(r2Id);
+        r2.setRootId(r2Root);
+        r2.setContractorId(r2Contractor);
+        r2.setWorkerId(r2Worker);
+        r2.setDescription(description);
+        r2.setNeighborhood(neighborhood);
+        r2.setExactAddress(exactAddress);
+        r2.setScheduledDateTime(scheduledDateTime);
+        r2.setState(state);
+        r2.setDateCreated(dateCreated);
+        r2.setCancellationDateTime(cancellationDateTime);
+        r2.setCancellationState(cancellationState);
+
+        Request r1Saved = requestRepo.save(r1);
+        Request r2Saved = requestRepo.save(r2);
+
+        List<Request> list = requestRepo.findAllRequestsForUser(r1Saved.getContractorId());
+        assertEquals(list.size(),2);
+
+        assertTrue(list.contains(r1Saved));
+        assertTrue(list.contains(r2Saved));
+
+        assertEquals(list.get(0).getContractorId(),list.get(1).getWorkerId());
+        assertNotEquals(list.get(0).getId(),list.get(1).getId());
+    }
+
+    @Test 
+    @DisplayName("Debe encontrar la solicitud que genera bloqueo entre el trabajador y contratante")
+    void shouldFindCancelledWithPenalizationRequest(){
+        r1.setState(RequestState.CANCELED);
+        r1.setCancellationDateTime(r1.getDateCreated().plusDays(1));
+        r1.setCancellationState(CancellationState.IN_PROGRESS);
+
+        Request saved = requestRepo.save(r1);
+        
+        Optional<Request> optionalFound = requestRepo.findContractorHasCancelledWorker(saved.getContractorId(), saved.getWorkerId());
+        assertFalse(optionalFound.isEmpty());
+
+        Request found = optionalFound.orElse(null);
+        assertNotNull(found);
+
+        assertEquals(saved.getId(),found.getId());
+        assertEquals(found.getCancellationState(),CancellationState.IN_PROGRESS);
+        assertNotNull(found.getCancellationDateTime());
+        assertNotNull(found.getCancellationState());
+        assertTrue(found.getCancellationDateTime().isAfter(found.getDateCreated()));
+    }
+
+    @Test 
+    @DisplayName("No debe encontrar la solicitud que generó bloqueo al ser completada")
+    void shouldNotFindCancelledWithPenalizationCompletedRequest(){
+        r1.setState(RequestState.CANCELED);
+        r1.setCancellationDateTime(r1.getDateCreated().plusDays(1));
+        r1.setCancellationState(CancellationState.IN_PROGRESS);
+
+        Request saved = requestRepo.save(r1);
+        
+        Optional<Request> optionalFound = requestRepo.findContractorHasCancelledWorker(saved.getContractorId(), saved.getWorkerId());
+        assertFalse(optionalFound.isEmpty());
+
+        Request found = optionalFound.orElse(null);
+        assertNotNull(found);
+
+        assertEquals(saved.getId(),found.getId());
+        assertEquals(found.getCancellationState(),CancellationState.IN_PROGRESS);
+        assertNotNull(found.getCancellationDateTime());
+        assertNotNull(found.getCancellationState());
+        assertTrue(found.getCancellationDateTime().isAfter(found.getDateCreated()));
+
+        found.setCancellationState(CancellationState.COMPLETED);
+
+        requestRepo.save(found);
+
+        Optional<Request> optionalNotFound = requestRepo.findContractorHasCancelledWorker(saved.getContractorId(), saved.getWorkerId());
+        assertTrue(optionalNotFound.isEmpty());
+
+        Request notFound = optionalNotFound.orElse(null);
+        assertNull(notFound);
+
     }
 }
