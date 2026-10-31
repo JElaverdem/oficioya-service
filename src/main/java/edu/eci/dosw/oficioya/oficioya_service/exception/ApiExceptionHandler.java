@@ -55,4 +55,10 @@ public class ApiExceptionHandler {
         return ResponseEntity.badRequest().body(
                 ApiError.of(400, "Bad Request", "Cuerpo de la petición inválido", req.getRequestURI()));
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiError> argumentoInvalido(IllegalArgumentException ex, HttpServletRequest req) {
+        return ResponseEntity.badRequest().body(
+                ApiError.of(400, "Bad Request", ex.getMessage(), req.getRequestURI()));
+    }
 }

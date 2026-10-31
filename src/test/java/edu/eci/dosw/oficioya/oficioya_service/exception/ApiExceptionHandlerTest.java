@@ -89,6 +89,16 @@ class ApiExceptionHandlerTest {
         assertError(response, 400, "Bad Request");
     }
 
+    @Test
+    @DisplayName("IllegalArgumentException responde 400 con el mensaje de la excepcion")
+    void argumentoInvalido() {
+        ResponseEntity<ApiError> response =
+                handler.argumentoInvalido(new IllegalArgumentException("Falta el header X-User-Id"), request);
+
+        assertError(response, 400, "Bad Request");
+        assertEquals("Falta el header X-User-Id", response.getBody().mensaje());
+    }
+
     private void assertError(ResponseEntity<ApiError> response, int status, String error) {
         assertEquals(status, response.getStatusCode().value());
         assertNotNull(response.getBody());
