@@ -9,8 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.eci.dosw.oficioya.oficioya_service.dto.LoginRequest;
 import edu.eci.dosw.oficioya.oficioya_service.dto.LoginResponse;
 import edu.eci.dosw.oficioya.oficioya_service.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+@Tag(name = "Autenticacion", description = "Obtencion del token JWT para consumir la API")
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
@@ -21,8 +26,14 @@ public class AuthController {
         this.authService = authService;
     }
 
-    // El registro (POST /registro) se quitó: los usuarios ya no viven en este servicio.
-
+    @Operation(
+            summary = "Iniciar sesion",
+            description = "Devuelve un JWT con vigencia de 30 minutos. En esta version de laboratorio "
+                    + "las credenciales se ignoran y el token se emite con rol CONTRATANTE.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Token emitido"),
+            @ApiResponse(responseCode = "400", description = "Correo o password invalidos")
+    })
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest req) {
         return ResponseEntity.ok(authService.login(req));
