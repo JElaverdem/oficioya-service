@@ -1,0 +1,1530 @@
+{
+  "info": {
+    "name": "OficioYa - Service (seguridad y solicitudes)",
+    "description": "Pruebas de /api/v1/requests con tokens generados automáticamente. Antes de cada corrida ejecutar postman/seed-postman.sql. Ver postman/README.md.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Estado y login",
+      "item": [
+        {
+          "name": "Login (público, devuelve token de prueba)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"prueba@escuelaing.edu.co\",\n  \"password\": \"123456\"\n}"
+            },
+            "description": "El login es provisional: ignora las credenciales y entrega un token CONTRATANTE con un UUID aleatorio."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Devuelve accessToken', () => pm.expect(pm.response.json().accessToken).to.be.a('string').and.not.empty);",
+                  "pm.test('Tipo Bearer', () => pm.expect(pm.response.json().tipo).to.eql('Bearer'));",
+                  "pm.collectionVariables.set('tokenLogin', pm.response.json().accessToken);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login con cuerpo inválido -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"no-es-un-correo\",\n  \"password\": \"\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Cuerpo JSON con status 400', () => pm.expect(pm.response.json().status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Token del login abre GET /requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenLogin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Ejecutar después del login."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Devuelve una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Swagger: /v3/api-docs es público",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v3/api-docs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v3",
+                "api-docs"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Solo pasa con OpenApiConfig instalado y en perfil dev (en prod Swagger está deshabilitado)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un documento OpenAPI', () => pm.expect(pm.response.json().openapi).to.be.a('string'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "1. Sin token (401)",
+      "item": [
+        {
+          "name": "GET /requests sin token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Cuerpo JSON con status 401', () => pm.expect(pm.response.json().status).to.eql(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH accept sin token",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqAceptar}}/accept",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqAceptar}}",
+                "accept"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Cuerpo JSON con status 401', () => pm.expect(pm.response.json().status).to.eql(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH reject sin token",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqRechazar}}/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqRechazar}}",
+                "reject"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Cuerpo JSON con status 401', () => pm.expect(pm.response.json().status).to.eql(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH accept-conflict sin token",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqConflictoA}}/accept-conflict",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqConflictoA}}",
+                "accept-conflict"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Cuerpo JSON con status 401', () => pm.expect(pm.response.json().status).to.eql(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rutas de admin sin token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/cualquier-cosa",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "cualquier-cosa"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Cuerpo JSON con status 401', () => pm.expect(pm.response.json().status).to.eql(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Token inválido (401)",
+      "item": [
+        {
+          "name": "Token expirado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenExpirado}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Cuerpo JSON con status 401', () => pm.expect(pm.response.json().status).to.eql(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Token firmado con otra clave",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOtraClave}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Cuerpo JSON con status 401', () => pm.expect(pm.response.json().status).to.eql(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Token alterado (escalada CONTRATANTE -> TRABAJADOR)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqAceptar}}/accept",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqAceptar}}",
+                "accept"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAlterado}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Cuerpo JSON con status 401', () => pm.expect(pm.response.json().status).to.eql(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Token con otro emisor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOtroEmisor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Cuerpo JSON con status 401', () => pm.expect(pm.response.json().status).to.eql(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Token mal formado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenMalFormado}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Usa la variable tokenMalFormado (texto que no es un JWT)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Cuerpo JSON con status 401', () => pm.expect(pm.response.json().status).to.eql(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Rol equivocado (403)",
+      "item": [
+        {
+          "name": "CONTRATANTE no puede aceptar",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqAceptar}}/accept",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqAceptar}}",
+                "accept"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenContratante}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo JSON con status 403', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CONTRATANTE no puede rechazar",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqRechazar}}/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqRechazar}}",
+                "reject"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenContratante}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo JSON con status 403', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TRABAJADOR no puede resolver conflictos",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqConflictoA}}/accept-conflict",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqConflictoA}}",
+                "accept-conflict"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTrabajador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo JSON con status 403', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ADMIN no puede listar solicitudes (hoy)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Comportamiento actual: solo CONTRATANTE y TRABAJADOR. Pendiente de decisión del equipo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo JSON con status 403', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Token sin claim de rol",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenSinRol}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo JSON con status 403', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CONTRATANTE en rutas de admin",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/cualquier-cosa",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "cualquier-cosa"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenContratante}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo JSON con status 403', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Solicitud ajena o inexistente (404)",
+      "item": [
+        {
+          "name": "Trabajador acepta solicitud de otro trabajador",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqAjena}}/accept",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqAjena}}",
+                "accept"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTrabajador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Cuerpo JSON con status 404', () => pm.expect(pm.response.json().status).to.eql(404));",
+                  "pm.test('Mensaje: Solicitud no encontrada', () => pm.expect(pm.response.json().mensaje).to.eql('Solicitud no encontrada'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Trabajador rechaza solicitud de otro trabajador",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqAjena}}/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqAjena}}",
+                "reject"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTrabajador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Cuerpo JSON con status 404', () => pm.expect(pm.response.json().status).to.eql(404));",
+                  "pm.test('Mensaje: Solicitud no encontrada', () => pm.expect(pm.response.json().mensaje).to.eql('Solicitud no encontrada'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Solicitud inexistente",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/00000000-0000-0000-0000-000000000000/accept",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "00000000-0000-0000-0000-000000000000",
+                "accept"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTrabajador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Cuerpo JSON con status 404', () => pm.expect(pm.response.json().status).to.eql(404));",
+                  "pm.test('Mensaje: Solicitud no encontrada', () => pm.expect(pm.response.json().mensaje).to.eql('Solicitud no encontrada'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Contratante resuelve conflicto de otro contratante",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqConflictoAjeno}}/accept-conflict",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqConflictoAjeno}}",
+                "accept-conflict"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOtroContratante}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Cuerpo JSON con status 404', () => pm.expect(pm.response.json().status).to.eql(404));",
+                  "pm.test('Mensaje: Solicitud no encontrada', () => pm.expect(pm.response.json().mensaje).to.eql('Solicitud no encontrada'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Reglas de negocio (409)",
+      "item": [
+        {
+          "name": "Aceptar pasados los 30 minutos",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqTarde}}/accept",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqTarde}}",
+                "accept"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTrabajador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Cuerpo JSON con status 409', () => pm.expect(pm.response.json().status).to.eql(409));",
+                  "pm.test('Menciona los 30 minutos', () => pm.expect(pm.response.json().mensaje).to.include('30 minutos'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aceptar una solicitud que no está PENDING",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqNoPendiente}}/accept",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqNoPendiente}}",
+                "accept"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTrabajador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Cuerpo JSON con status 409', () => pm.expect(pm.response.json().status).to.eql(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rechazar una solicitud que no está PENDING",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqNoPendiente}}/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqNoPendiente}}",
+                "reject"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTrabajador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Cuerpo JSON con status 409', () => pm.expect(pm.response.json().status).to.eql(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resolver conflicto sobre una solicitud PENDING",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqAceptar}}/accept-conflict",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqAceptar}}",
+                "accept-conflict"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenContratante}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Cuerpo JSON con status 409', () => pm.expect(pm.response.json().status).to.eql(409));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Flujo feliz (200)",
+      "item": [
+        {
+          "name": "Trabajador lista sus solicitudes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTrabajador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Todas son del trabajador', () => pm.response.json().forEach(r => pm.expect(r.workerId).to.eql(pm.collectionVariables.get('trabajadorId'))));",
+                  "pm.test('No incluye la solicitud ajena', () => pm.expect(pm.response.json().map(r => r.id)).to.not.include(pm.collectionVariables.get('reqAjena')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Trabajador acepta su solicitud",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqAceptar}}/accept",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqAceptar}}",
+                "accept"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTrabajador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('state = ACCEPTED', () => pm.expect(pm.response.json().state).to.eql('ACCEPTED'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Trabajador rechaza su solicitud",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqRechazar}}/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqRechazar}}",
+                "reject"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTrabajador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('state = REJECTED', () => pm.expect(pm.response.json().state).to.eql('REJECTED'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Contratante resuelve el conflicto eligiendo la A",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests/{{reqConflictoA}}/accept-conflict",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                "{{reqConflictoA}}",
+                "accept-conflict"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenContratante}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('state = ACCEPTED', () => pm.expect(pm.response.json().state).to.eql('ACCEPTED'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La otra solicitud del conflicto quedó CANCELED",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOtroTrabajador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json().find(r => r.id === pm.collectionVariables.get('reqConflictoB'));",
+                  "pm.test('La B existe', () => pm.expect(b).to.not.be.undefined);",
+                  "pm.test('La B quedó CANCELED', () => pm.expect(b.state).to.eql('CANCELED'));",
+                  "pm.test('Cancelación COMPLETED', () => pm.expect(b.cancellationState).to.eql('COMPLETED'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Contratante lista sus solicitudes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenContratante}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Todas son del contratante', () => pm.response.json().forEach(r => pm.expect(r.contractorId).to.eql(pm.collectionVariables.get('contratanteId'))));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Genera tokens JWT HS256 con la misma clave del servicio (variable jwtSecret) para probar roles sin tocar el código.",
+          "const secret = pm.collectionVariables.get('jwtSecret');",
+          "const issuer = pm.collectionVariables.get('issuer');",
+          "const b64url = (wa) => CryptoJS.enc.Base64.stringify(wa).replace(/=+$/, '').replace(/\\+/g, '-').replace(/\\//g, '_');",
+          "const enc = (obj) => b64url(CryptoJS.enc.Utf8.parse(JSON.stringify(obj)));",
+          "function jwt(sub, role, key, iss, iat, exp) {",
+          "  const payload = { sub: sub, iss: iss, iat: iat, exp: exp };",
+          "  if (role) { payload.role = role; }",
+          "  const body = enc({ alg: 'HS256', typ: 'JWT' }) + '.' + enc(payload);",
+          "  return body + '.' + b64url(CryptoJS.HmacSHA256(body, key));",
+          "}",
+          "const now = Math.floor(Date.now() / 1000);",
+          "const ok = now + 1800;",
+          "const v = (k) => pm.collectionVariables.get(k);",
+          "const set = (k, t) => pm.collectionVariables.set(k, t);",
+          "",
+          "set('tokenTrabajador',      jwt(v('trabajadorId'),      'TRABAJADOR',  secret, issuer, now, ok));",
+          "set('tokenOtroTrabajador',  jwt(v('otroTrabajadorId'),  'TRABAJADOR',  secret, issuer, now, ok));",
+          "set('tokenContratante',     jwt(v('contratanteId'),     'CONTRATANTE', secret, issuer, now, ok));",
+          "set('tokenOtroContratante', jwt(v('otroContratanteId'), 'CONTRATANTE', secret, issuer, now, ok));",
+          "set('tokenAdmin',           jwt(v('adminId'),           'ADMIN',       secret, issuer, now, ok));",
+          "set('tokenSinRol',          jwt(v('trabajadorId'),      null,          secret, issuer, now, ok));",
+          "set('tokenExpirado',        jwt(v('trabajadorId'),      'TRABAJADOR',  secret, issuer, now - 7200, now - 3600));",
+          "set('tokenOtraClave',       jwt(v('trabajadorId'),      'TRABAJADOR',  'otra-clave-distinta-de-al-menos-256-bits-0123456789', issuer, now, ok));",
+          "set('tokenOtroEmisor',      jwt(v('trabajadorId'),      'TRABAJADOR',  secret, 'otro-emisor', now, ok));",
+          "// Token alterado: payload de CONTRATANTE reescrito como TRABAJADOR, con la firma original (debe rechazarse)",
+          "const original = jwt(v('contratanteId'), 'CONTRATANTE', secret, issuer, now, ok).split('.');",
+          "const forjado = enc({ sub: v('contratanteId'), iss: issuer, iat: now, exp: ok, role: 'TRABAJADOR' });",
+          "set('tokenAlterado', original[0] + '.' + forjado + '.' + original[2]);"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081"
+    },
+    {
+      "key": "jwtSecret",
+      "value": "oficioya-service-secret-key-must-be-at-least-256-bits-long-1234567890"
+    },
+    {
+      "key": "issuer",
+      "value": "oficioya"
+    },
+    {
+      "key": "trabajadorId",
+      "value": "11111111-1111-1111-1111-111111111111"
+    },
+    {
+      "key": "otroTrabajadorId",
+      "value": "22222222-2222-2222-2222-222222222222"
+    },
+    {
+      "key": "contratanteId",
+      "value": "33333333-3333-3333-3333-333333333333"
+    },
+    {
+      "key": "otroContratanteId",
+      "value": "44444444-4444-4444-4444-444444444444"
+    },
+    {
+      "key": "adminId",
+      "value": "55555555-5555-5555-5555-555555555555"
+    },
+    {
+      "key": "reqAceptar",
+      "value": "aaaaaaaa-0000-0000-0000-000000000001"
+    },
+    {
+      "key": "reqRechazar",
+      "value": "aaaaaaaa-0000-0000-0000-000000000002"
+    },
+    {
+      "key": "reqAjena",
+      "value": "aaaaaaaa-0000-0000-0000-000000000003"
+    },
+    {
+      "key": "reqTarde",
+      "value": "aaaaaaaa-0000-0000-0000-000000000004"
+    },
+    {
+      "key": "reqNoPendiente",
+      "value": "aaaaaaaa-0000-0000-0000-000000000005"
+    },
+    {
+      "key": "reqConflictoA",
+      "value": "aaaaaaaa-0000-0000-0000-000000000006"
+    },
+    {
+      "key": "reqConflictoB",
+      "value": "aaaaaaaa-0000-0000-0000-000000000007"
+    },
+    {
+      "key": "reqConflictoAjeno",
+      "value": "aaaaaaaa-0000-0000-0000-000000000008"
+    },
+    {
+      "key": "tokenMalFormado",
+      "value": "esto-no-es-un-jwt"
+    }
+  ]
+}
