@@ -28,7 +28,7 @@ class ImageDocumentTest {
         assertEquals(fecha, doc.getFechaCarga());
         assertEquals("ref-externa", doc.getReferenciaExterna());
         assertNull(doc.getId());
-        assertNull(doc.getRequestId());
+        assertNull(doc.getRootId());
     }
 
     @Test
@@ -36,12 +36,12 @@ class ImageDocumentTest {
     void settersYGetters() {
         ImageDocument doc = new ImageDocument();
         UUID id = UUID.randomUUID();
-        UUID requestId = UUID.randomUUID();
+        UUID rootId = UUID.randomUUID();
         byte[] datos = { 9, 8 };
         LocalDateTime fecha = LocalDateTime.now();
 
         doc.setId(id);
-        doc.setRequestId(requestId);
+        doc.setRootId(rootId);
         doc.setNombre("foto.jpg");
         doc.setTipoContenido("image/jpeg");
         doc.setTamano(2L);
@@ -50,7 +50,7 @@ class ImageDocumentTest {
         doc.setReferenciaExterna("otra-ref");
 
         assertEquals(id, doc.getId());
-        assertEquals(requestId, doc.getRequestId());
+        assertEquals(rootId, doc.getRootId());
         assertEquals("foto.jpg", doc.getNombre());
         assertEquals("image/jpeg", doc.getTipoContenido());
         assertEquals(2L, doc.getTamano());

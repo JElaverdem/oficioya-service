@@ -12,7 +12,7 @@ public class ImageDocument {
     @Id
     private UUID id;
 
-    private UUID requestId;
+    private UUID rootId;
 
     private String nombre;
     private String tipoContenido;
@@ -42,12 +42,12 @@ public class ImageDocument {
         this.id = newId;
     }
 
-    public void setRequestId(UUID requestId){
-        this.requestId = requestId;
+    public void setRootId(UUID requestId){
+        this.rootId = requestId;
     }
 
-    public UUID getRequestId(){
-        return this.requestId;
+    public UUID getRootId(){
+        return this.rootId;
     }
 
     public String getNombre() {

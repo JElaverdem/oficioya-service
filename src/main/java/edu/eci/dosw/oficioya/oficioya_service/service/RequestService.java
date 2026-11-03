@@ -1,18 +1,23 @@
 package edu.eci.dosw.oficioya.oficioya_service.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import edu.eci.dosw.oficioya.oficioya_service.dto.RequestRequest;
+import edu.eci.dosw.oficioya.oficioya_service.dto.RequestResponse;
 import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
 import edu.eci.dosw.oficioya.oficioya_service.exception.RecursoNoEncontradoException;
 import edu.eci.dosw.oficioya.oficioya_service.exception.TransicionInvalidaException;
 import edu.eci.dosw.oficioya.oficioya_service.mapper.RequestMapper;
+import edu.eci.dosw.oficioya.oficioya_service.mapper.ResponseMapper;
 import edu.eci.dosw.oficioya.oficioya_service.model.CancellationState;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestModel;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestState;
@@ -28,11 +33,75 @@ public class RequestService {
 
     private final RequestRepository requestRepository;
     private final RequestMapper requestMapper;
+    private final ResponseMapper responseMapper;
 
-    public RequestService(RequestRepository requestRepository, RequestMapper requestMapper) {
+    public RequestService(RequestRepository requestRepository, RequestMapper requestMapper, ResponseMapper responseMapper) {
         this.requestRepository = requestRepository;
         this.requestMapper = requestMapper;
+        this.responseMapper = responseMapper;
     }
+
+    public RequestResponse create(RequestRequest req, UUID contractorId){
+        List<UUID> workers = req.workersId();
+
+        if(workers.size() <= 0){
+            //TIRAR EL ERROR Y HACER HANDLING
+        }
+        /*
+        Si la lista está vacía tira 422
+         */
+
+
+        /*Verficar que el contractor exista
+         */
+
+        List<UUID> verifiedWorkers = new ArrayList<>();
+        for (UUID id : workers){
+            //VERIFICACION DE QUE EXISTA
+
+            Optional<Request> contractorCancelledWorker = requestRepository.findContractorHasCancelledWorker(contractorId, id);
+
+            if(!contractorCancelledWorker.isEmpty()){
+                LocalDateTime cancellationDate = contractorCancelledWorker.orElse(null).getCancellationDateTime();
+                if(LocalDateTime.now().isAfter(cancellationDate.plusWeeks(1))){
+                    contractorCancelledWorker.orElse(null).setCancellationState(CancellationState.COMPLETED);
+                }
+                else{
+                    continue;
+                }
+            }
+
+            //VERIFICACION FRANJA HORARIA
+            verifiedWorkers.add(id); //TEMPORAL
+        }
+        /*
+        Verificar que el worker exista y sí tenga esa franja horaria
+         */
+
+
+        if (verifiedWorkers.size() <= 0){
+            //TIRAR EXCEPTION Y HACER HANDLING
+        }
+        /*
+        Si no encuentra ningún trabajador tira error 404
+         */
+        
+        UUID newRootId = UUID.randomUUID();
+
+        while (requestRepository.existsById(newRootId)){
+            newRootId = UUID.randomUUID();
+        }
+
+        List<Request> createdRequests = responseMapper.toEntities(contractorId, verifiedWorkers, req, newRootId);
+
+        /* 
+        Mandar la notificacion a los workers
+        */
+
+        return responseMapper.toRespone(requestRepository.saveAll(createdRequests));
+
+    }
+
 
     /** Todas las solicitudes (no eliminadas) donde el usuario es contratante o trabajador. */
     @Transactional(readOnly = true)
@@ -103,6 +172,47 @@ public class RequestService {
 
         chosen.setState(RequestState.ACCEPTED);
         return requestMapper.toModel(requestRepository.save(chosen));
+    }
+
+    public boolean deleteRequest(UUID requestId){
+        Optional<Request> found = requestRepository.findById(requestId);
+
+        if(found.isEmpty()){
+            throw new RecursoNoEncontradoException(SOLICITUD_NO_ENCONTRADA);
+        }
+
+        int changed = requestRepository.specialDeleteById(requestId);
+
+        if(changed == 1){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public boolean existsById(UUID requestId){
+        Optional<Request> found = requestRepository.findById(requestId);
+        if(!found.isEmpty() && found.orElse(null).getState() != RequestState.DELETED){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public Optional<Request> getRequest(UUID requestId){
+        return requestRepository.findById(requestId);
+    }
+
+    public Optional<UUID> getRootId(UUID requestId){
+        Optional<Request> found = requestRepository.findById(requestId);
+        if(!found.isEmpty()){
+            return Optional.of(found.orElse(null).getRootId());
+        }
+        else{
+            return Optional.empty();
+        }
     }
 
     // Una solicitud ajena responde igual que una inexistente (404) para no revelar que existe.

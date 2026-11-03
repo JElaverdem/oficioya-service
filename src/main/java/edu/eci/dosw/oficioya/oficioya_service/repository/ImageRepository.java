@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ImageRepository extends MongoRepository<ImageDocument, String> {
-    List<ImageDocument> findByRequestId(UUID requestId);
+    List<ImageDocument> findByRootId(UUID requestId);
     List<ImageDocument> findByReferenciaExterna(String referenciaExterna);
 }

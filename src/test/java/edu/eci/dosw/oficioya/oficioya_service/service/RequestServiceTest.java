@@ -31,6 +31,7 @@ import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
 import edu.eci.dosw.oficioya.oficioya_service.exception.RecursoNoEncontradoException;
 import edu.eci.dosw.oficioya.oficioya_service.exception.TransicionInvalidaException;
 import edu.eci.dosw.oficioya.oficioya_service.mapper.RequestMapper;
+import edu.eci.dosw.oficioya.oficioya_service.mapper.ResponseMapper;
 import edu.eci.dosw.oficioya.oficioya_service.model.CancellationState;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestModel;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestState;
@@ -51,7 +52,7 @@ class RequestServiceTest {
 
     @BeforeEach
     void preparar() {
-        service = new RequestService(requestRepository, Mappers.getMapper(RequestMapper.class));
+        service = new RequestService(requestRepository, Mappers.getMapper(RequestMapper.class), Mappers.getMapper(ResponseMapper.class));
         contratante = UUID.randomUUID();
         trabajador = UUID.randomUUID();
         rootId = UUID.randomUUID();
