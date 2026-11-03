@@ -12,16 +12,21 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
+import edu.eci.dosw.oficioya.oficioya_service.mapper.RequestMapper;
+import edu.eci.dosw.oficioya.oficioya_service.mapper.ResponseMapper;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestState;
 import edu.eci.dosw.oficioya.oficioya_service.repository.RequestRepository;
 
@@ -31,6 +36,12 @@ class RequestCompletionServiceTest {
 
     @Mock
     RequestRepository requestRepository;
+
+    @Mock 
+    ResponseMapper responseMapper;
+    
+    @Spy
+    RequestMapper requestMapper = Mappers.getMapper(RequestMapper.class);
 
     @InjectMocks
     RequestCompletionService service;

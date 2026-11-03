@@ -74,6 +74,9 @@ public class RequestCancellationService {
         }
 
         request.setState(RequestState.CANCELED);
+        if (request.getCancellationState() == null) {
+            request.setCancellationState(CancellationState.COMPLETED);
+        }
         request.setCancellationDateTime(LocalDateTime.now());
         requestRepository.save(request);
     }

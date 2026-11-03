@@ -52,7 +52,7 @@ class RequestServiceTest {
 
     @BeforeEach
     void preparar() {
-        service = new RequestService(requestRepository, Mappers.getMapper(RequestMapper.class), Mappers.getMapper(ResponseMapper.class));
+        service = new RequestService(requestRepository, Mappers.getMapper(RequestMapper.class), new ResponseMapper());
         contratante = UUID.randomUUID();
         trabajador = UUID.randomUUID();
         rootId = UUID.randomUUID();
