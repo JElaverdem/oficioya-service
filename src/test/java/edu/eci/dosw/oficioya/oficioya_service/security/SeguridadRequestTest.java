@@ -33,7 +33,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import edu.eci.dosw.oficioya.oficioya_service.TestcontainersConfiguration;
 import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestState;
 import edu.eci.dosw.oficioya.oficioya_service.repository.ImageRepository;
@@ -50,7 +49,6 @@ import io.jsonwebtoken.security.Keys;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(TestcontainersConfiguration.class)
 class SeguridadRequestTest {
 
     private static final String BASE = "/api/v1/requests";
