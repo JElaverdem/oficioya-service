@@ -20,6 +20,12 @@
 
 ![Diagrama de clases Service](/src/main/resources/docs/uml/DiagramaClases-Service.png)
 
+## Cómo ejecutar
+
+1. Levantar el back con perfil `dev` en `http://localhost:8080`.
+2. El front se ejecuta en `http://localhost:5173` y se conecta por proxy a `/api`.
+3. Repositorio del front: https://github.com/juanjorivlo/DOSW_Lab9_Front_FLRGM
+
 ## Mock Up
 
 ### Link
