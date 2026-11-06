@@ -1,6 +1,7 @@
 package edu.eci.dosw.oficioya.oficioya_service.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
 import edu.eci.dosw.oficioya.oficioya_service.exception.CredencialesInvalidasException;
 import edu.eci.dosw.oficioya.oficioya_service.exception.RecursoNoEncontradoException;
+import edu.eci.dosw.oficioya.oficioya_service.exception.RecursosAjenosException;
 import edu.eci.dosw.oficioya.oficioya_service.mapper.RequestMapper;
 import edu.eci.dosw.oficioya.oficioya_service.model.CancellationState;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestModel;
@@ -21,9 +23,12 @@ public class RequestCancellationService {
 
     private final RequestMapper requestMapper;
 
-    public RequestCancellationService(RequestRepository requestRepository, RequestMapper requestMapper) {
+    private final RequestService requestService;
+
+    public RequestCancellationService(RequestRepository requestRepository, RequestMapper requestMapper, RequestService requestService) {
         this.requestRepository = requestRepository;
         this.requestMapper = requestMapper;
+        this.requestService = requestService;
     }
 
     public RequestModel cancelRequest(UUID requestId, UUID userId){
@@ -31,14 +36,14 @@ public class RequestCancellationService {
             throw new RecursoNoEncontradoException("NO_ENCONTRADO");
         }
 
-        /*
-        VERIFICAR SI EL USUARIO EXISTE
-         */
+        if(requestService.verifyExistentUserPublic(userId)){
+            throw new RecursoNoEncontradoException("Usuario no encontrado");
+        }
 
         Request found = requestRepository.findById(requestId).orElse(null);
 
         if(userId != found.getContractorId() && userId != found.getWorkerId()){
-            // TIRAR UN ERROR 403 Y HACER HANDLING
+            throw new RecursosAjenosException();
         }
 
         if(userId == found.getContractorId()){
@@ -79,6 +84,8 @@ public class RequestCancellationService {
         }
         request.setCancellationDateTime(LocalDateTime.now());
         requestRepository.save(request);
+
+        requestService.sendNotificationPublic(List.of(request), RequestState.CANCELED);
     }
 
     public void cancelByWorker(UUID requestId, UUID workerId) {
@@ -102,5 +109,7 @@ public class RequestCancellationService {
         request.setCancellationState(CancellationState.COMPLETED);
         request.setCancellationDateTime(LocalDateTime.now());
         requestRepository.save(request);
+
+        requestService.sendNotificationPublic(List.of(request), RequestState.CANCELED);
     }
 }

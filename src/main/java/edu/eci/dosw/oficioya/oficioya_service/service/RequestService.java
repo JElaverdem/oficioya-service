@@ -15,6 +15,7 @@ import edu.eci.dosw.oficioya.oficioya_service.dto.RequestRequest;
 import edu.eci.dosw.oficioya.oficioya_service.dto.RequestResponse;
 import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
 import edu.eci.dosw.oficioya.oficioya_service.exception.RecursoNoEncontradoException;
+import edu.eci.dosw.oficioya.oficioya_service.exception.RequestSinWorkersException;
 import edu.eci.dosw.oficioya.oficioya_service.exception.TransicionInvalidaException;
 import edu.eci.dosw.oficioya.oficioya_service.mapper.RequestMapper;
 import edu.eci.dosw.oficioya.oficioya_service.mapper.ResponseMapper;
@@ -27,7 +28,6 @@ import edu.eci.dosw.oficioya.oficioya_service.repository.RequestRepository;
 public class RequestService {
 
     private static final long MINUTOS_PARA_RESPONDER = 30;
-    private static final String SOLICITUD_NO_ENCONTRADA = "Solicitud no encontrada";
     private static final Set<RequestState> CANCELABLES_EN_CONFLICTO =
             EnumSet.of(RequestState.PENDING, RequestState.ACCEPTED, RequestState.CONFLICT);
 
@@ -45,19 +45,18 @@ public class RequestService {
         List<UUID> workers = req.workersId();
 
         if(workers.size() <= 0){
-            //TIRAR EL ERROR Y HACER HANDLING
+            throw new RequestSinWorkersException();
         }
-        /*
-        Si la lista está vacía tira 422
-         */
 
-
-        /*Verficar que el contractor exista
-         */
+        if(!verifyExistentUser(contractorId)){
+            throw new RecursoNoEncontradoException(RecursoNoEncontradoException.CONTRATADOR_NO_ENCONTRADO);
+        }
 
         List<UUID> verifiedWorkers = new ArrayList<>();
         for (UUID id : workers){
-            //VERIFICACION DE QUE EXISTA
+            if(verifyExistentWorker(id)){
+                continue;
+            }
 
             Optional<Request> contractorCancelledWorker = requestRepository.findContractorHasCancelledWorker(contractorId, id);
 
@@ -71,20 +70,14 @@ public class RequestService {
                 }
             }
 
-            //VERIFICACION FRANJA HORARIA
-            verifiedWorkers.add(id); //TEMPORAL
+            if(verifyWorkerSlot(id, req.scheduledDateTime())){
+                verifiedWorkers.add(id);
+            }
         }
-        /*
-        Verificar que el worker exista y sí tenga esa franja horaria
-         */
-
 
         if (verifiedWorkers.size() <= 0){
-            //TIRAR EXCEPTION Y HACER HANDLING
+            throw new RecursoNoEncontradoException(RecursoNoEncontradoException.TRABAJADOR_NO_ENCONTRADO);
         }
-        /*
-        Si no encuentra ningún trabajador tira error 404
-         */
         
         UUID newRootId = UUID.randomUUID();
 
@@ -94,9 +87,7 @@ public class RequestService {
 
         List<Request> createdRequests = responseMapper.toEntities(contractorId, verifiedWorkers, req, newRootId);
 
-        /* 
-        Mandar la notificacion a los workers
-        */
+        sendNotification(createdRequests, RequestState.PENDING);
 
         return responseMapper.toRespone(requestRepository.saveAll(createdRequests));
 
@@ -128,10 +119,12 @@ public class RequestService {
 
         if (accepted.isEmpty()) {
             request.setState(RequestState.ACCEPTED);
+            sendNotification(List.of(request), RequestState.ACCEPTED);
         } else {
             request.setState(RequestState.CONFLICT);
             accepted.forEach(r -> r.setState(RequestState.CONFLICT));
             requestRepository.saveAll(accepted);
+            sendNotification(accepted, RequestState.CONFLICT);
         }
         return requestMapper.toModel(requestRepository.save(request));
     }
@@ -142,6 +135,7 @@ public class RequestService {
         Request request = findAssignedToWorker(requestId, workerId);
         requireAnswerable(request);
         request.setState(RequestState.REJECTED);
+        sendNotification(List.of(request), RequestState.REJECTED);
         return requestMapper.toModel(requestRepository.save(request));
     }
 
@@ -153,7 +147,7 @@ public class RequestService {
     public RequestModel acceptConflict(UUID requestId, UUID contractorId) {
         Request chosen = requestRepository.findById(requestId)
                 .filter(r -> r.getContractorId().equals(contractorId))
-                .orElseThrow(() -> new RecursoNoEncontradoException(SOLICITUD_NO_ENCONTRADA));
+                .orElseThrow(() -> new RecursoNoEncontradoException(RecursoNoEncontradoException.SOLICITUD_NO_ENCONTRADA));
         if (chosen.getState() != RequestState.CONFLICT) {
             throw new TransicionInvalidaException("Solo se puede resolver un conflicto sobre una solicitud en estado CONFLICT");
         }
@@ -169,8 +163,10 @@ public class RequestService {
             other.setCancellationDateTime(now);
         }
         requestRepository.saveAll(others);
+        sendNotification(others, RequestState.CANCELED);
 
         chosen.setState(RequestState.ACCEPTED);
+        sendNotification(List.of(chosen), RequestState.ACCEPTED);
         return requestMapper.toModel(requestRepository.save(chosen));
     }
 
@@ -178,7 +174,7 @@ public class RequestService {
         Optional<Request> found = requestRepository.findById(requestId);
 
         if(found.isEmpty()){
-            throw new RecursoNoEncontradoException(SOLICITUD_NO_ENCONTRADA);
+            throw new RecursoNoEncontradoException(RecursoNoEncontradoException.SOLICITUD_NO_ENCONTRADA);
         }
 
         int changed = requestRepository.specialDeleteById(requestId);
@@ -219,7 +215,7 @@ public class RequestService {
     private Request findAssignedToWorker(UUID requestId, UUID workerId) {
         return requestRepository.findById(requestId)
                 .filter(r -> r.getWorkerId().equals(workerId))
-                .orElseThrow(() -> new RecursoNoEncontradoException(SOLICITUD_NO_ENCONTRADA));
+                .orElseThrow(() -> new RecursoNoEncontradoException(RecursoNoEncontradoException.SOLICITUD_NO_ENCONTRADA));
     }
 
     private void requireAnswerable(Request request) {
@@ -230,5 +226,44 @@ public class RequestService {
                 && request.getDateCreated().plusMinutes(MINUTOS_PARA_RESPONDER).isBefore(LocalDateTime.now())) {
             throw new TransicionInvalidaException("Tiempo de respuesta excedido (30 minutos)");
         }
+    }
+
+    public boolean verifyExistentUserPublic(UUID userId){
+        return verifyExistentUser(userId);
+    }
+
+    /*True if the user exists, false if he doesnt */
+    private boolean verifyExistentUser(UUID userId){
+        /*Conexión con usuario
+         */
+        return true;
+    }
+
+    /*True if the worker exists, false if he doesnt */
+    private boolean verifyExistentWorker(UUID workerId){
+        /*Conexión con worker
+         */
+        return true;
+    }
+
+    /*True if the worker has the slot free and reserves it, false if he doesnt and/or couldnt reserve it*/
+    private boolean verifyWorkerSlot(UUID workerId, LocalDateTime timeSlot){
+        /*Conexión con worker
+        Verificar primero si el worker tiene esa franja libre
+        Si está libre reservarla y devuelve true
+
+        Si es posible que el worker tenga una función directa para reservar y que haga las dos al tiempo y devuelva boolean
+         */
+        return true;
+    }
+
+    public void sendNotificationPublic(List<Request> requests, RequestState state){
+        sendNotification(requests, state);
+    }
+    
+    private void sendNotification(List<Request> requests, RequestState state){
+        /*
+        Enviar la notificacion
+         */
     }
 }
