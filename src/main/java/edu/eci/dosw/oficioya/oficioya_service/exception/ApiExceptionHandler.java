@@ -55,4 +55,10 @@ public class ApiExceptionHandler {
         return ResponseEntity.badRequest().body(
                 ApiError.of(400, "Bad Request", "Cuerpo de la petición inválido", req.getRequestURI()));
     }
+
+    @ExceptionHandler(RequestSinWorkersException.class)
+    public ResponseEntity<ApiError> listaVacia(RequestSinWorkersException ex, HttpServletRequest req) {
+        return ResponseEntity.badRequest().body(
+                ApiError.of(42, "Lista de worker vacía", "Cuerpo de la petición no cumple", req.getRequestURI()));
+    }
 }
