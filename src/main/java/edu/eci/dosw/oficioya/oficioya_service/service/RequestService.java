@@ -34,11 +34,13 @@ public class RequestService {
     private final RequestRepository requestRepository;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
+    private final NotificationService notificationService;
 
-    public RequestService(RequestRepository requestRepository, RequestMapper requestMapper, ResponseMapper responseMapper) {
+    public RequestService(RequestRepository requestRepository, RequestMapper requestMapper, ResponseMapper responseMapper, NotificationService notificationService) {
         this.requestRepository = requestRepository;
         this.requestMapper = requestMapper;
         this.responseMapper = responseMapper;
+        this.notificationService = notificationService;
     }
 
     public RequestResponse create(RequestRequest req, UUID contractorId){
@@ -97,6 +99,10 @@ public class RequestService {
         /* 
         Mandar la notificacion a los workers
         */
+
+        // Notificar a los workers (microservicio de notificaciones)
+        final UUID rootId = newRootId;
+        verifiedWorkers.forEach(w -> notificationService.notifyNewRequest(w, rootId));
 
         return responseMapper.toRespone(requestRepository.saveAll(createdRequests));
 

@@ -21,9 +21,12 @@ public class RequestCancellationService {
 
     private final RequestMapper requestMapper;
 
-    public RequestCancellationService(RequestRepository requestRepository, RequestMapper requestMapper) {
+    private final NotificationService notificationService;
+
+    public RequestCancellationService(RequestRepository requestRepository, RequestMapper requestMapper, NotificationService notificationService) {
         this.requestRepository = requestRepository;
         this.requestMapper = requestMapper;
+        this.notificationService = notificationService;
     }
 
     public RequestModel cancelRequest(UUID requestId, UUID userId){
@@ -78,6 +81,8 @@ public class RequestCancellationService {
             request.setCancellationState(CancellationState.COMPLETED);
         }
         request.setCancellationDateTime(LocalDateTime.now());
+        // Notificar al trabajador que la solicitud fue cancelada (microservicio de notificaciones)
+        notificationService.notifyCancelled(request.getWorkerId(), requestId);
         requestRepository.save(request);
     }
 
@@ -102,6 +107,8 @@ public class RequestCancellationService {
         request.setState(RequestState.CANCELED);
         request.setCancellationState(CancellationState.COMPLETED);
         request.setCancellationDateTime(LocalDateTime.now());
+        // Notificar al contratante que la solicitud fue cancelada (microservicio de notificaciones)
+        notificationService.notifyCancelled(request.getContractorId(), requestId);
         requestRepository.save(request);
     }
     private void penalizarReputacion(UUID workerId) {

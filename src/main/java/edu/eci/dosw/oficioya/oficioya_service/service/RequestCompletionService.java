@@ -15,10 +15,12 @@ public class RequestCompletionService {
 
     private final RequestRepository requestRepository;
     private final RequestMapper requestMapper;
+    private final NotificationService notificationService;
 
-    public RequestCompletionService(RequestRepository requestRepository, RequestMapper requestMapper) {
+    public RequestCompletionService(RequestRepository requestRepository, RequestMapper requestMapper, NotificationService notificationService) {
         this.requestRepository = requestRepository;
         this.requestMapper = requestMapper;
+        this.notificationService = notificationService;
     }
 
     public RequestModel completeRequest(UUID requestId, UUID workerId) {
@@ -30,9 +32,8 @@ public class RequestCompletionService {
             throw new RuntimeException("Solo se pueden completar solicitudes en estado ACCEPTED");
         }
         request.setState(RequestState.COMPLETED);
-        /*
-        Mandar notificacion
-         */
+        // Notificar al contratante que el trabajo fue completado (microservicio de notificaciones)
+        notificationService.notifyCompleted(request.getContractorId(), requestId);
         return requestMapper.toModel(requestRepository.save(request));
     }
 }
