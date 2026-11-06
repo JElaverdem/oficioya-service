@@ -44,7 +44,7 @@ public class RequestController {
         this.requestCompletionService = requestCompletionService;
     }
 
-    @PutMapping
+    @PostMapping
     @PreAuthorize("hasRole('CONTRATANTE')")
     public RequestResponse create(@Valid @RequestBody RequestRequest req, Authentication authentication){
         RequestResponse response = requestService.create(req, CurrentUser.id(authentication));
