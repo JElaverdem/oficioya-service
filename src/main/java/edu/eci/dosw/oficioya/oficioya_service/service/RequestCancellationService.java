@@ -95,7 +95,8 @@ public class RequestCancellationService {
         if (request.getState() == RequestState.ACCEPTED && request.getScheduledDateTime() != null) {
             LocalDateTime limit = request.getScheduledDateTime().minusHours(24);
             if (LocalDateTime.now().isAfter(limit)) {
-                throw new RuntimeException(" ESTE ES UN TEXTO PROVICION PQ AÚN NO SABEMOS COMO CONECTARNOS CON EL OTRO MICROSERVICIO");
+                // Penalizacion de reputacion: -0.5 puntos al trabajador (se delega al microservicio de reputacion)
+                penalizarReputacion(workerId);
             }
         }
         request.setState(RequestState.CANCELED);
@@ -103,4 +104,9 @@ public class RequestCancellationService {
         request.setCancellationDateTime(LocalDateTime.now());
         requestRepository.save(request);
     }
+    private void penalizarReputacion(UUID workerId) {
+        // TODO: invocar microservicio de reputacion para restar 0.5 puntos
+        System.out.println("Penalizacion de reputacion -0.5 para trabajador: " + workerId);
+    }
+
 }
