@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import edu.eci.dosw.oficioya.oficioya_service.dto.RequestRequest;
 import edu.eci.dosw.oficioya.oficioya_service.dto.RequestResponse;
+import edu.eci.dosw.oficioya.oficioya_service.dto.ServiceReportResponse;
 import edu.eci.dosw.oficioya.oficioya_service.dto.WorkerStatsResponse;
 import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
 import edu.eci.dosw.oficioya.oficioya_service.exception.RecursoNoEncontradoException;
@@ -125,6 +128,27 @@ public class RequestService {
                 .filter(r -> r.getState() == RequestState.COMPLETED)
                 .count();
         return new WorkerStatsResponse(workerId, completed, 0.0, List.of());
+    }
+
+    /** Reporte de solicitudes por período: por estado, franja horaria y barrio. */
+    @Transactional(readOnly = true)
+    public ServiceReportResponse getReport(LocalDateTime from, LocalDateTime to) {
+        List<Request> requests = requestRepository.findAll().stream()
+                .filter(r -> r.getScheduledDateTime() != null
+                        && !r.getScheduledDateTime().isBefore(from)
+                        && !r.getScheduledDateTime().isAfter(to))
+                .toList();
+
+        Map<String, Long> byStatus = requests.stream()
+                .collect(Collectors.groupingBy(r -> r.getState().name(), Collectors.counting()));
+
+        Map<String, Long> byNeighborhood = requests.stream()
+                .collect(Collectors.groupingBy(Request::getNeighborhood, Collectors.counting()));
+
+        Map<Integer, Long> byHour = requests.stream()
+                .collect(Collectors.groupingBy(r -> r.getScheduledDateTime().getHour(), Collectors.counting()));
+
+        return new ServiceReportResponse(requests.size(), byStatus, byNeighborhood, byHour);
     }
 
     /**
