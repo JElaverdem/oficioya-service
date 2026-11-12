@@ -28,6 +28,7 @@ import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
 import edu.eci.dosw.oficioya.oficioya_service.model.CancellationState;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestState;
 import edu.eci.dosw.oficioya.oficioya_service.repository.RequestRepository;
+import edu.eci.dosw.oficioya.oficioya_service.service.NotificationService;
 
 /**
  * SNOY-20: ventana de 24 h de las cancelaciones.
@@ -42,6 +43,9 @@ class RequestCancellationServiceTest {
 
     @Mock
     RequestRepository requestRepository;
+
+    @Mock
+    NotificationService notificationService;
 
     @InjectMocks
     RequestCancellationService service;
@@ -174,10 +178,10 @@ class RequestCancellationServiceTest {
         Request r = solicitud(UUID.randomUUID(), trabajador, RequestState.ACCEPTED, LocalDateTime.now().plusHours(5));
         when(requestRepository.findById(r.getId())).thenReturn(Optional.of(r));
 
-        assertThrows(RuntimeException.class, () -> service.cancelByWorker(r.getId(), trabajador));
+        service.cancelByWorker(r.getId(), trabajador);
 
-        assertEquals(RequestState.ACCEPTED, r.getState());
-        verify(requestRepository, never()).save(any());
+        assertEquals(RequestState.CANCELED, r.getState());
+        verify(requestRepository).save(r);
     }
 
     @Test

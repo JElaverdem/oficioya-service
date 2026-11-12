@@ -23,12 +23,12 @@ public class RequestCancellationService {
 
     private final RequestMapper requestMapper;
 
-    private final RequestService requestService;
+    private final NotificationService notificationService;
 
-    public RequestCancellationService(RequestRepository requestRepository, RequestMapper requestMapper, RequestService requestService) {
+    public RequestCancellationService(RequestRepository requestRepository, RequestMapper requestMapper, NotificationService notificationService) {
         this.requestRepository = requestRepository;
         this.requestMapper = requestMapper;
-        this.requestService = requestService;
+        this.notificationService = notificationService;
     }
 
     public RequestModel cancelRequest(UUID requestId, UUID userId){
@@ -83,9 +83,10 @@ public class RequestCancellationService {
             request.setCancellationState(CancellationState.COMPLETED);
         }
         request.setCancellationDateTime(LocalDateTime.now());
+        // Notificar al trabajador que la solicitud fue cancelada (microservicio de notificaciones)
+        notificationService.notifyCancelled();
         requestRepository.save(request);
 
-        requestService.sendNotificationPublic(List.of(request), RequestState.CANCELED);
     }
 
     public void cancelByWorker(UUID requestId, UUID workerId) {
@@ -102,14 +103,20 @@ public class RequestCancellationService {
         if (request.getState() == RequestState.ACCEPTED && request.getScheduledDateTime() != null) {
             LocalDateTime limit = request.getScheduledDateTime().minusHours(24);
             if (LocalDateTime.now().isAfter(limit)) {
-                throw new RuntimeException(" ESTE ES UN TEXTO PROVICION PQ AÚN NO SABEMOS COMO CONECTARNOS CON EL OTRO MICROSERVICIO");
+                // Penalizacion de reputacion: -0.5 puntos al trabajador (se delega al microservicio de reputacion)
+                penalizarReputacion(workerId);
             }
         }
         request.setState(RequestState.CANCELED);
         request.setCancellationState(CancellationState.COMPLETED);
         request.setCancellationDateTime(LocalDateTime.now());
+        // Notificar al contratante que la solicitud fue cancelada (microservicio de notificaciones)
+        notificationService.notifyCancelled();
         requestRepository.save(request);
-
-        requestService.sendNotificationPublic(List.of(request), RequestState.CANCELED);
     }
+    private void penalizarReputacion(UUID workerId) {
+        // TODO: invocar microservicio de reputacion para restar 0.5 puntos
+        System.out.println("Penalizacion de reputacion -0.5 para trabajador: " + workerId);
+    }
+
 }

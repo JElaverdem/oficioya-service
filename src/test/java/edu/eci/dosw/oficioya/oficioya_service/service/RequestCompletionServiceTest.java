@@ -39,6 +39,9 @@ class RequestCompletionServiceTest {
 
     @Mock 
     ResponseMapper responseMapper;
+
+    @Mock
+    NotificationService notificationService;
     
     @Spy
     RequestMapper requestMapper = Mappers.getMapper(RequestMapper.class);

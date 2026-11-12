@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import edu.eci.dosw.oficioya.oficioya_service.dto.RequestRequest;
 import edu.eci.dosw.oficioya.oficioya_service.dto.RequestResponse;
+import edu.eci.dosw.oficioya.oficioya_service.dto.ServiceReportResponse;
+import edu.eci.dosw.oficioya.oficioya_service.dto.UserResponse;
+import edu.eci.dosw.oficioya.oficioya_service.dto.WorkerStatsResponse;
 import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
 import edu.eci.dosw.oficioya.oficioya_service.exception.RecursoNoEncontradoException;
 import edu.eci.dosw.oficioya.oficioya_service.exception.RequestSinWorkersException;
@@ -34,22 +39,35 @@ public class RequestService {
     private final RequestRepository requestRepository;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
+    private final NotificationService notificationService;
+    private final UserClient userClient;
 
-    public RequestService(RequestRepository requestRepository, RequestMapper requestMapper, ResponseMapper responseMapper) {
+    public RequestService(RequestRepository requestRepository, RequestMapper requestMapper, ResponseMapper responseMapper, NotificationService notificationService, UserClient userClient) {
         this.requestRepository = requestRepository;
         this.requestMapper = requestMapper;
         this.responseMapper = responseMapper;
+        this.notificationService = notificationService;
+        this.userClient = userClient;
     }
 
     public RequestResponse create(RequestRequest req, UUID contractorId){
         List<UUID> workers = req.workersId();
 
         if(workers.size() <= 0){
-            throw new RequestSinWorkersException();
+            //TIRAR EL ERROR Y HACER HANDLING
         }
+        /*
+        Si la lista está vacía tira 422
+         */
 
-        if(!verifyExistentUser(contractorId)){
-            throw new RecursoNoEncontradoException(RecursoNoEncontradoException.CONTRATADOR_NO_ENCONTRADO);
+
+        /*Verficar que el contractor exista
+         */
+        if (userClient != null) {
+            UserResponse contractor = userClient.getUser(contractorId);
+            if (contractor == null || contractor.roles() == null || !contractor.roles().contains("CONTRATANTE")) {
+                throw new RecursoNoEncontradoException("Contratante no válido o inactivo");
+            }
         }
 
         List<UUID> verifiedWorkers = new ArrayList<>();
@@ -87,7 +105,13 @@ public class RequestService {
 
         List<Request> createdRequests = responseMapper.toEntities(contractorId, verifiedWorkers, req, newRootId);
 
-        sendNotification(createdRequests, RequestState.PENDING);
+        /* 
+        Mandar la notificacion a los workers
+        */
+
+        // Notificar a los workers (microservicio de notificaciones)
+        final UUID rootId = newRootId;
+        verifiedWorkers.forEach(w -> notificationService.notifyNewRequest(w, rootId));
 
         return responseMapper.toRespone(requestRepository.saveAll(createdRequests));
 
@@ -100,6 +124,36 @@ public class RequestService {
         return requestRepository.findAllRequestsForUser(userId).stream()
                 .map(requestMapper::toModel)
                 .toList();
+    }
+
+    /** Estadísticas del trabajador para otros dominios (completedJobs, monthlyEarnings, topServices). */
+    @Transactional(readOnly = true)
+    public WorkerStatsResponse getWorkerStats(UUID workerId) {
+        long completed = requestRepository.findAllRequestsForUser(workerId).stream()
+                .filter(r -> r.getState() == RequestState.COMPLETED)
+                .count();
+        return new WorkerStatsResponse(workerId, completed, 0.0, List.of());
+    }
+
+    /** Reporte de solicitudes por período: por estado, franja horaria y barrio. */
+    @Transactional(readOnly = true)
+    public ServiceReportResponse getReport(LocalDateTime from, LocalDateTime to) {
+        List<Request> requests = requestRepository.findAll().stream()
+                .filter(r -> r.getScheduledDateTime() != null
+                        && !r.getScheduledDateTime().isBefore(from)
+                        && !r.getScheduledDateTime().isAfter(to))
+                .toList();
+
+        Map<String, Long> byStatus = requests.stream()
+                .collect(Collectors.groupingBy(r -> r.getState().name(), Collectors.counting()));
+
+        Map<String, Long> byNeighborhood = requests.stream()
+                .collect(Collectors.groupingBy(Request::getNeighborhood, Collectors.counting()));
+
+        Map<Integer, Long> byHour = requests.stream()
+                .collect(Collectors.groupingBy(r -> r.getScheduledDateTime().getHour(), Collectors.counting()));
+
+        return new ServiceReportResponse(requests.size(), byStatus, byNeighborhood, byHour);
     }
 
     /**
