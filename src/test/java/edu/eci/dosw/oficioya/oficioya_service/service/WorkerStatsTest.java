@@ -28,7 +28,8 @@ class WorkerStatsTest {
         RequestService service = new RequestService(requestRepository,
                 org.mapstruct.factory.Mappers.getMapper(edu.eci.dosw.oficioya.oficioya_service.mapper.RequestMapper.class),
                 new edu.eci.dosw.oficioya.oficioya_service.mapper.ResponseMapper(),
-                new edu.eci.dosw.oficioya.oficioya_service.service.LoggingNotificationService());
+                new edu.eci.dosw.oficioya.oficioya_service.service.LoggingNotificationService(),
+                null);
 
         WorkerStatsResponse stats = service.getWorkerStats(workerId);
 
