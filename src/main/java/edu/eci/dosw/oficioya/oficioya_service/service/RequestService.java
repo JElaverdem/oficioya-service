@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import edu.eci.dosw.oficioya.oficioya_service.dto.RequestRequest;
 import edu.eci.dosw.oficioya.oficioya_service.dto.RequestResponse;
+import edu.eci.dosw.oficioya.oficioya_service.dto.WorkerStatsResponse;
 import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
 import edu.eci.dosw.oficioya.oficioya_service.exception.RecursoNoEncontradoException;
 import edu.eci.dosw.oficioya.oficioya_service.exception.TransicionInvalidaException;
@@ -115,6 +116,15 @@ public class RequestService {
         return requestRepository.findAllRequestsForUser(userId).stream()
                 .map(requestMapper::toModel)
                 .toList();
+    }
+
+    /** Estadísticas del trabajador para otros dominios (completedJobs, monthlyEarnings, topServices). */
+    @Transactional(readOnly = true)
+    public WorkerStatsResponse getWorkerStats(UUID workerId) {
+        long completed = requestRepository.findAllRequestsForUser(workerId).stream()
+                .filter(r -> r.getState() == RequestState.COMPLETED)
+                .count();
+        return new WorkerStatsResponse(workerId, completed, 0.0, List.of());
     }
 
     /**
