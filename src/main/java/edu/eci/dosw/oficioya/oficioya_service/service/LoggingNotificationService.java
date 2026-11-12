@@ -4,7 +4,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-@Service
+// Reemplazado por HttpNotificationService para la integración real con oficioya-notification.
+// Se conserva la clase para compatibilidad con tests existentes.
 public class LoggingNotificationService implements NotificationService {
 
     @Override
