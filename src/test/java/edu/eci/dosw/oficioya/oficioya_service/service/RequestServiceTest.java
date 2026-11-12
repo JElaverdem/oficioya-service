@@ -47,6 +47,9 @@ class RequestServiceTest {
     @Mock
     NotificationService notificationService;
 
+    @Mock
+    UserClient userClient;
+
     RequestService service;
 
     UUID contratante;
@@ -55,7 +58,7 @@ class RequestServiceTest {
 
     @BeforeEach
     void preparar() {
-        service = new RequestService(requestRepository, Mappers.getMapper(RequestMapper.class), new ResponseMapper(), notificationService);
+        service = new RequestService(requestRepository, Mappers.getMapper(RequestMapper.class), new ResponseMapper(), notificationService, userClient);
         contratante = UUID.randomUUID();
         trabajador = UUID.randomUUID();
         rootId = UUID.randomUUID();

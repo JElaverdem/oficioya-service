@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import edu.eci.dosw.oficioya.oficioya_service.dto.RequestRequest;
 import edu.eci.dosw.oficioya.oficioya_service.dto.RequestResponse;
 import edu.eci.dosw.oficioya.oficioya_service.dto.ServiceReportResponse;
+import edu.eci.dosw.oficioya.oficioya_service.dto.UserResponse;
 import edu.eci.dosw.oficioya.oficioya_service.dto.WorkerStatsResponse;
 import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
 import edu.eci.dosw.oficioya.oficioya_service.exception.RecursoNoEncontradoException;
@@ -39,12 +40,14 @@ public class RequestService {
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
     private final NotificationService notificationService;
+    private final UserClient userClient;
 
-    public RequestService(RequestRepository requestRepository, RequestMapper requestMapper, ResponseMapper responseMapper, NotificationService notificationService) {
+    public RequestService(RequestRepository requestRepository, RequestMapper requestMapper, ResponseMapper responseMapper, NotificationService notificationService, UserClient userClient) {
         this.requestRepository = requestRepository;
         this.requestMapper = requestMapper;
         this.responseMapper = responseMapper;
         this.notificationService = notificationService;
+        this.userClient = userClient;
     }
 
     public RequestResponse create(RequestRequest req, UUID contractorId){
@@ -60,6 +63,12 @@ public class RequestService {
 
         /*Verficar que el contractor exista
          */
+        if (userClient != null) {
+            UserResponse contractor = userClient.getUser(contractorId);
+            if (contractor == null || contractor.roles() == null || !contractor.roles().contains("CONTRATANTE")) {
+                throw new RecursoNoEncontradoException("Contratante no válido o inactivo");
+            }
+        }
 
         List<UUID> verifiedWorkers = new ArrayList<>();
         for (UUID id : workers){
