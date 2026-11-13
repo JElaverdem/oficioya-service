@@ -23,7 +23,7 @@ class WorkerStatsTest {
     @Test
     void statsWithNoRequests() {
         UUID workerId = UUID.randomUUID();
-        when(requestRepository.findAllRequestsForUser(workerId)).thenReturn(List.of());
+        when(requestRepository.findAllRequestsForWorker(workerId)).thenReturn(List.of());
 
         RequestService service = new RequestService(requestRepository,
                 org.mapstruct.factory.Mappers.getMapper(edu.eci.dosw.oficioya.oficioya_service.mapper.RequestMapper.class),
