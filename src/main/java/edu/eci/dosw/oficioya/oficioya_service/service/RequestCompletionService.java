@@ -6,6 +6,8 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
+import edu.eci.dosw.oficioya.oficioya_service.exception.RecursoNoEncontradoException;
+import edu.eci.dosw.oficioya.oficioya_service.exception.RecursosAjenosException;
 import edu.eci.dosw.oficioya.oficioya_service.mapper.RequestMapper;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestModel;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestState;
@@ -25,16 +27,20 @@ public class RequestCompletionService {
     }
 
     public RequestModel completeRequest(UUID requestId, UUID workerId) {
-        Request request = requestRepository.findById(requestId).orElseThrow();
+        Request request = requestRepository.findById(requestId)
+            .orElseThrow(() -> new RecursoNoEncontradoException(RecursoNoEncontradoException.SOLICITUD_NO_ENCONTRADA));
+
         if (!request.getWorkerId().equals(workerId)) {
-            throw new RuntimeException("Solo el trabajador asignado puede completar esta solicitud");
+            throw new RecursosAjenosException();
         }
+
         if (request.getState() != RequestState.ACCEPTED) {
+            //TODO: Debería de cambiarse la exception para hacer handling
             throw new RuntimeException("Solo se pueden completar solicitudes en estado ACCEPTED");
         }
         request.setState(RequestState.COMPLETED);
         // Notificar al contratante que el trabajo fue completado (microservicio de notificaciones)
-        notificationService.notifyCompleted();
+        notificationService.notifyCompleted(request.getContractorId(), requestId);
 
         return requestMapper.toModel(requestRepository.save(request));
     }

@@ -45,6 +45,11 @@ public class HttpNotificationService implements NotificationService {
         send(contractorId, "COMPLETED_WORK", requestId, "El trabajo fue reportado como terminado");
     }
 
+    @Override
+    public void notifyRejected(UUID contractorId, UUID requestId) {
+        send(contractorId, "REJECTED_REQUEST", requestId, "El trabajo fue rechazado por el trabajador");
+    }
+
     private void send(UUID receiverId, String type, UUID requestId, String message) {
         try {
             Map<String, Object> payload = Map.of(

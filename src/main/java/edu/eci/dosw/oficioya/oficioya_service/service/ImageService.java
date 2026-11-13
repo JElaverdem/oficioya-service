@@ -22,6 +22,9 @@ public class ImageService {
     }
 
     public void addImages(List<ImageDocument> images){
+        /*
+        Cambiar por conexión con el orquestador para guardarlas
+        */
         imageRepository.saveAll(images);
     }
 
@@ -32,6 +35,9 @@ public class ImageService {
             return new ArrayList<>();
         }
 
+        /*
+        Cambiar a conexión con el orquestador para buscar imagenes
+        */
         return imageRepository.findByRootId(found.orElse(null).getRootId());
   
     }

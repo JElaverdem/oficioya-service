@@ -56,6 +56,20 @@ public interface RequestRepository extends JpaRepository<Request, UUID> {
 
     @Query("""
     SELECT r FROM Request r
+    WHERE r.contractorId = :user
+      AND r.state <> edu.eci.dosw.oficioya.oficioya_service.model.RequestState.DELETED
+    """)
+    List<Request> findAllRequestsForContractor(@Param("user") UUID contractor);
+
+    @Query("""
+    SELECT r FROM Request r
+    WHERE r.workerId = :user
+      AND r.state <> edu.eci.dosw.oficioya.oficioya_service.model.RequestState.DELETED
+    """)
+    List<Request> findAllRequestsForWorker(@Param("user") UUID worker);
+
+    @Query("""
+    SELECT r FROM Request r
     WHERE (r.contractorId = :user OR r.workerId = :user)
       AND r.state <> :state
     """)

@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import edu.eci.dosw.oficioya.oficioya_service.dto.UserResponse;
 import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
 import edu.eci.dosw.oficioya.oficioya_service.exception.CredencialesInvalidasException;
 import edu.eci.dosw.oficioya.oficioya_service.exception.RecursoNoEncontradoException;
@@ -25,10 +26,13 @@ public class RequestCancellationService {
 
     private final NotificationService notificationService;
 
-    public RequestCancellationService(RequestRepository requestRepository, RequestMapper requestMapper, NotificationService notificationService) {
+    private final UserClient userClient;
+
+    public RequestCancellationService(RequestRepository requestRepository, RequestMapper requestMapper, NotificationService notificationService, UserClient userClient) {
         this.requestRepository = requestRepository;
         this.requestMapper = requestMapper;
         this.notificationService = notificationService;
+        this.userClient = userClient;
     }
 
     public RequestModel cancelRequest(UUID requestId, UUID userId){
@@ -36,8 +40,11 @@ public class RequestCancellationService {
             throw new RecursoNoEncontradoException("NO_ENCONTRADO");
         }
 
-        if(requestService.verifyExistentUserPublic(userId)){
-            throw new RecursoNoEncontradoException("Usuario no encontrado");
+        if (userClient != null) {
+            UserResponse user = userClient.getUser(userId);
+            if (user == null || user.roles() == null) {
+                throw new RecursoNoEncontradoException("Usuario no válido o inactivo");
+            }
         }
 
         Request found = requestRepository.findById(requestId).orElse(null);
@@ -83,9 +90,11 @@ public class RequestCancellationService {
             request.setCancellationState(CancellationState.COMPLETED);
         }
         request.setCancellationDateTime(LocalDateTime.now());
-        // Notificar al trabajador que la solicitud fue cancelada (microservicio de notificaciones)
-        notificationService.notifyCancelled();
         requestRepository.save(request);
+        // Notificar al trabajador que la solicitud fue cancelada (microservicio de notificaciones)
+        notificationService.notifyCancelled(request.getWorkerId(), requestId);
+
+        //TODO: ELIMINAR FRANJA HORARIA DEL WORKER
 
     }
 
@@ -110,9 +119,11 @@ public class RequestCancellationService {
         request.setState(RequestState.CANCELED);
         request.setCancellationState(CancellationState.COMPLETED);
         request.setCancellationDateTime(LocalDateTime.now());
-        // Notificar al contratante que la solicitud fue cancelada (microservicio de notificaciones)
-        notificationService.notifyCancelled();
         requestRepository.save(request);
+        // Notificar al contratante que la solicitud fue cancelada (microservicio de notificaciones)
+        notificationService.notifyCancelled(request.getContractorId(), requestId);
+
+        //TODO: ELIMINAR FRANJA HORARIA DEL WORKER
     }
     private void penalizarReputacion(UUID workerId) {
         // TODO: invocar microservicio de reputacion para restar 0.5 puntos

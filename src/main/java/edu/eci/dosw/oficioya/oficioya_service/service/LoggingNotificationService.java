@@ -26,4 +26,9 @@ public class LoggingNotificationService implements NotificationService {
     public void notifyCompleted(UUID contractorId, UUID requestId) {
         System.out.println("Notificacion: trabajo completado " + requestId + " para contratante " + contractorId);
     }
+
+    @Override
+    public void notifyRejected(UUID contractorId, UUID requestId) {
+        System.out.println("Notificacion: trabajo rechazado " + requestId + " para contratante " + contractorId);
+    }
 }

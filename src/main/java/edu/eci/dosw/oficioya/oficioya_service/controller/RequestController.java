@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,10 +27,13 @@ import edu.eci.dosw.oficioya.oficioya_service.service.ImageService;
 import edu.eci.dosw.oficioya.oficioya_service.service.RequestCancellationService;
 import edu.eci.dosw.oficioya.oficioya_service.service.RequestCompletionService;
 import edu.eci.dosw.oficioya.oficioya_service.service.RequestService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/requests")
+@Tag(name="Requests", description = "API to control the life of the requests")
 public class RequestController {
 
     private final RequestService requestService;
@@ -46,6 +50,7 @@ public class RequestController {
 
     @PostMapping
     @PreAuthorize("hasRole('CONTRATANTE')")
+    @Operation(summary="Create a request", description = "Creates a request and saves it with its images")
     public RequestResponse create(@Valid @RequestBody RequestRequest req, Authentication authentication){
         RequestResponse response = requestService.create(req, CurrentUser.id(authentication));
         List<ImageDocument> images = req.images();
@@ -57,48 +62,65 @@ public class RequestController {
     }
 
     /*
-        Conexión con los de búsqueda, donde hacemos un get para obtener los workers disponibles para ese tipo de trabajo
-     */
-
-
     @PreAuthorize("hasAnyRole('CONTRATANTE', 'TRABAJADOR')")
     @GetMapping
     public List<RequestModel> listMine(Authentication authentication) {
         return requestService.listRequestsForUser(CurrentUser.id(authentication));
     }
+    */
+
+    @PreAuthorize("hasRole('TRABAJADOR')")
+    @GetMapping("/worker")
+    @Operation(summary="List requests for a worker", description = "Lists all the requests of a worker, excluding the ones he made as a contractor and the eliminated ones")
+    public List<RequestModel> listForWorker(Authentication authentication){
+        return requestService.listRequestsForWorker(CurrentUser.id(authentication));
+    }
+
+    @PreAuthorize("hasRole('CONTRATANTE')")
+    @GetMapping ("/contractor")
+    @Operation(summary="List requests for a contractor", description = "Lists all the requests made as a contractor, if the user is a worker too, it only shows the ones that were not received and excludes too the eliminated ones")
+    public List<RequestModel> listForContractor(Authentication authentication){
+        return requestService.listRequestsForContractor(CurrentUser.id(authentication));
+    }
 
     @PreAuthorize("hasRole('TRABAJADOR')")
     @PatchMapping("/{id}/accept")
+    @Operation(summary="Accept a request", description = "Lets the worker accept a request")
     public RequestModel accept(@PathVariable UUID id, Authentication authentication) {
         return requestService.acceptRequest(id, CurrentUser.id(authentication));
     }
 
     @PreAuthorize("hasRole('TRABAJADOR')")
     @PatchMapping("/{id}/reject")
+    @Operation(summary="Reject a request", description = "Lets the worker reject a request")
     public RequestModel reject(@PathVariable UUID id, Authentication authentication) {
         return requestService.rejectRequest(id, CurrentUser.id(authentication));
     }
 
     @PreAuthorize("hasRole('CONTRATANTE')")
     @PatchMapping("/{id}/accept-conflict")
+    @Operation(summary="Resolve conflict", description = "Lets the contractor resolve a conflict between the conflicted requests")
     public RequestModel acceptConflict(@PathVariable UUID id, Authentication authentication) {
         return requestService.acceptConflict(id, CurrentUser.id(authentication));
     }
 
     @PatchMapping("/{id}/cancel")
     @PreAuthorize("hasAnyRole('CONTRATANTE', 'TRABAJADOR')")
+    @Operation(summary="Cancel a request", description = "Lets a worker or a contractor cancel a request")
     public RequestModel cancelRequest(@PathVariable UUID id, Authentication authentication){
         return requestCancellationService.cancelRequest(id,CurrentUser.id(authentication));
     }
 
     @PatchMapping("/{id}/complete")
     @PreAuthorize("hasRole('TRABAJADOR')")
+    @Operation(summary="Complete a request", description = "Lets the worker complete a request")
     public RequestModel completeRequest(@PathVariable UUID id, Authentication authentication){
         return requestCompletionService.completeRequest(id, CurrentUser.id(authentication));
     }
     
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('CONTRATANTE')")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary="Delete a request", description = "Lets only an admin delete a request")
     public ResponseEntity<String> deleteRequest(@PathVariable UUID id){
         if(requestService.deleteRequest(id)){
             return ResponseEntity.status(HttpStatus.OK).body("Request deleted");

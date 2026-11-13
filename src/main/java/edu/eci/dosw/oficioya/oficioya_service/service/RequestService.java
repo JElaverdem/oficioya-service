@@ -54,15 +54,9 @@ public class RequestService {
         List<UUID> workers = req.workersId();
 
         if(workers.size() <= 0){
-            //TIRAR EL ERROR Y HACER HANDLING
+            throw new RequestSinWorkersException();
         }
-        /*
-        Si la lista está vacía tira 422
-         */
 
-
-        /*Verficar que el contractor exista
-         */
         if (userClient != null) {
             UserResponse contractor = userClient.getUser(contractorId);
             if (contractor == null || contractor.roles() == null || !contractor.roles().contains("CONTRATANTE")) {
@@ -71,8 +65,12 @@ public class RequestService {
         }
 
         List<UUID> verifiedWorkers = new ArrayList<>();
+        UserResponse worker = null;
+
         for (UUID id : workers){
-            if(verifyExistentWorker(id)){
+            worker = userClient.getUser(id);
+
+            if (worker == null || worker.roles() == null || !worker.roles().contains("TRABAJADOR")) {
                 continue;
             }
 
@@ -88,7 +86,9 @@ public class RequestService {
                 }
             }
 
-            if(verifyWorkerSlot(id, req.scheduledDateTime())){
+            //TODO: AGREGAR FRANJA HORARIA DEL WORKER
+            //Si está libre se agrega
+            if(true){
                 verifiedWorkers.add(id);
             }
         }
@@ -99,19 +99,13 @@ public class RequestService {
         
         UUID newRootId = UUID.randomUUID();
 
-        while (requestRepository.existsById(newRootId)){
+        while (requestRepository.findByRootId(newRootId).size() >= 1){
             newRootId = UUID.randomUUID();
         }
 
         List<Request> createdRequests = responseMapper.toEntities(contractorId, verifiedWorkers, req, newRootId);
 
-        /* 
-        Mandar la notificacion a los workers
-        */
-
-        // Notificar a los workers (microservicio de notificaciones)
-        final UUID rootId = newRootId;
-        verifiedWorkers.forEach(w -> notificationService.notifyNewRequest(w, rootId));
+        createdRequests.forEach(w -> notificationService.notifyNewRequest(w.getWorkerId(), w.getId()));
 
         return responseMapper.toRespone(requestRepository.saveAll(createdRequests));
 
@@ -126,10 +120,24 @@ public class RequestService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<RequestModel> listRequestsForWorker(UUID workerId) {
+        return requestRepository.findAllRequestsForWorker(workerId).stream()
+                .map(requestMapper::toModel)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<RequestModel> listRequestsForContractor(UUID contractorId) {
+        return requestRepository.findAllRequestsForContractor(contractorId).stream()
+                .map(requestMapper::toModel)
+                .toList();
+    }
+
     /** Estadísticas del trabajador para otros dominios (completedJobs, monthlyEarnings, topServices). */
     @Transactional(readOnly = true)
     public WorkerStatsResponse getWorkerStats(UUID workerId) {
-        long completed = requestRepository.findAllRequestsForUser(workerId).stream()
+        long completed = requestRepository.findAllRequestsForWorker(workerId).stream()
                 .filter(r -> r.getState() == RequestState.COMPLETED)
                 .count();
         return new WorkerStatsResponse(workerId, completed, 0.0, List.of());
@@ -173,12 +181,12 @@ public class RequestService {
 
         if (accepted.isEmpty()) {
             request.setState(RequestState.ACCEPTED);
-            sendNotification(List.of(request), RequestState.ACCEPTED);
+            notificationService.notifyAccepted(request.getContractorId(),requestId);
         } else {
             request.setState(RequestState.CONFLICT);
             accepted.forEach(r -> r.setState(RequestState.CONFLICT));
             requestRepository.saveAll(accepted);
-            sendNotification(accepted, RequestState.CONFLICT);
+            //notificationService;???
         }
         return requestMapper.toModel(requestRepository.save(request));
     }
@@ -189,7 +197,8 @@ public class RequestService {
         Request request = findAssignedToWorker(requestId, workerId);
         requireAnswerable(request);
         request.setState(RequestState.REJECTED);
-        sendNotification(List.of(request), RequestState.REJECTED);
+        notificationService.notifyRejected(request.getContractorId(), requestId);
+        //TODO: ELIMINAR FRANJA HORARIA DEL WORKER
         return requestMapper.toModel(requestRepository.save(request));
     }
 
@@ -217,10 +226,12 @@ public class RequestService {
             other.setCancellationDateTime(now);
         }
         requestRepository.saveAll(others);
-        sendNotification(others, RequestState.CANCELED);
 
         chosen.setState(RequestState.ACCEPTED);
-        sendNotification(List.of(chosen), RequestState.ACCEPTED);
+        
+        others.forEach(r -> notificationService.notifyCancelled(r.getContractorId(), requestId));
+
+        //TODO: ELIMINAR FRANJA HORARIA DEL WORKER
         return requestMapper.toModel(requestRepository.save(chosen));
     }
 
@@ -280,44 +291,5 @@ public class RequestService {
                 && request.getDateCreated().plusMinutes(MINUTOS_PARA_RESPONDER).isBefore(LocalDateTime.now())) {
             throw new TransicionInvalidaException("Tiempo de respuesta excedido (30 minutos)");
         }
-    }
-
-    public boolean verifyExistentUserPublic(UUID userId){
-        return verifyExistentUser(userId);
-    }
-
-    /*True if the user exists, false if he doesnt */
-    private boolean verifyExistentUser(UUID userId){
-        /*Conexión con usuario
-         */
-        return true;
-    }
-
-    /*True if the worker exists, false if he doesnt */
-    private boolean verifyExistentWorker(UUID workerId){
-        /*Conexión con worker
-         */
-        return true;
-    }
-
-    /*True if the worker has the slot free and reserves it, false if he doesnt and/or couldnt reserve it*/
-    private boolean verifyWorkerSlot(UUID workerId, LocalDateTime timeSlot){
-        /*Conexión con worker
-        Verificar primero si el worker tiene esa franja libre
-        Si está libre reservarla y devuelve true
-
-        Si es posible que el worker tenga una función directa para reservar y que haga las dos al tiempo y devuelva boolean
-         */
-        return true;
-    }
-
-    public void sendNotificationPublic(List<Request> requests, RequestState state){
-        sendNotification(requests, state);
-    }
-    
-    private void sendNotification(List<Request> requests, RequestState state){
-        /*
-        Enviar la notificacion
-         */
     }
 }
