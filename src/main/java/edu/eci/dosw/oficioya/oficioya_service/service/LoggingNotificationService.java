@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-@Service
 public class LoggingNotificationService implements NotificationService {
 
     @Override
@@ -25,5 +24,10 @@ public class LoggingNotificationService implements NotificationService {
     @Override
     public void notifyCompleted(UUID contractorId, UUID requestId) {
         System.out.println("Notificacion: trabajo completado " + requestId + " para contratante " + contractorId);
+    }
+
+    @Override
+    public void notifyRejected(UUID contractorId, UUID requestId) {
+        System.out.println("Notificacion: trabajo rechazado " + requestId + " para contratante " + contractorId);
     }
 }

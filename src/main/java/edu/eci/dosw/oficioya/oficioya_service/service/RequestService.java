@@ -20,6 +20,7 @@ import edu.eci.dosw.oficioya.oficioya_service.dto.UserResponse;
 import edu.eci.dosw.oficioya.oficioya_service.dto.WorkerStatsResponse;
 import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
 import edu.eci.dosw.oficioya.oficioya_service.exception.RecursoNoEncontradoException;
+import edu.eci.dosw.oficioya.oficioya_service.exception.RequestSinWorkersException;
 import edu.eci.dosw.oficioya.oficioya_service.exception.TransicionInvalidaException;
 import edu.eci.dosw.oficioya.oficioya_service.mapper.RequestMapper;
 import edu.eci.dosw.oficioya.oficioya_service.mapper.ResponseMapper;
@@ -32,7 +33,6 @@ import edu.eci.dosw.oficioya.oficioya_service.repository.RequestRepository;
 public class RequestService {
 
     private static final long MINUTOS_PARA_RESPONDER = 30;
-    private static final String SOLICITUD_NO_ENCONTRADA = "Solicitud no encontrada";
     private static final Set<RequestState> CANCELABLES_EN_CONFLICTO =
             EnumSet.of(RequestState.PENDING, RequestState.ACCEPTED, RequestState.CONFLICT);
 
@@ -54,15 +54,9 @@ public class RequestService {
         List<UUID> workers = req.workersId();
 
         if(workers.size() <= 0){
-            //TIRAR EL ERROR Y HACER HANDLING
+            throw new RequestSinWorkersException();
         }
-        /*
-        Si la lista está vacía tira 422
-         */
 
-
-        /*Verficar que el contractor exista
-         */
         if (userClient != null) {
             UserResponse contractor = userClient.getUser(contractorId);
             if (contractor == null || contractor.roles() == null || !contractor.roles().contains("CONTRATANTE")) {
@@ -71,8 +65,14 @@ public class RequestService {
         }
 
         List<UUID> verifiedWorkers = new ArrayList<>();
+        UserResponse worker = null;
+
         for (UUID id : workers){
-            //VERIFICACION DE QUE EXISTA
+            worker = userClient.getUser(id);
+
+            if (worker == null || worker.roles() == null || !worker.roles().contains("TRABAJADOR")) {
+                continue;
+            }
 
             Optional<Request> contractorCancelledWorker = requestRepository.findContractorHasCancelledWorker(contractorId, id);
 
@@ -86,36 +86,26 @@ public class RequestService {
                 }
             }
 
-            //VERIFICACION FRANJA HORARIA
-            verifiedWorkers.add(id); //TEMPORAL
+            //TODO: AGREGAR FRANJA HORARIA DEL WORKER
+            //Si está libre se agrega
+            if(true){
+                verifiedWorkers.add(id);
+            }
         }
-        /*
-        Verificar que el worker exista y sí tenga esa franja horaria
-         */
-
 
         if (verifiedWorkers.size() <= 0){
-            //TIRAR EXCEPTION Y HACER HANDLING
+            throw new RecursoNoEncontradoException(RecursoNoEncontradoException.TRABAJADOR_NO_ENCONTRADO);
         }
-        /*
-        Si no encuentra ningún trabajador tira error 404
-         */
         
         UUID newRootId = UUID.randomUUID();
 
-        while (requestRepository.existsById(newRootId)){
+        while (requestRepository.findByRootId(newRootId).size() >= 1){
             newRootId = UUID.randomUUID();
         }
 
         List<Request> createdRequests = responseMapper.toEntities(contractorId, verifiedWorkers, req, newRootId);
 
-        /* 
-        Mandar la notificacion a los workers
-        */
-
-        // Notificar a los workers (microservicio de notificaciones)
-        final UUID rootId = newRootId;
-        verifiedWorkers.forEach(w -> notificationService.notifyNewRequest(w, rootId));
+        createdRequests.forEach(w -> notificationService.notifyNewRequest(w.getWorkerId(), w.getId()));
 
         return responseMapper.toRespone(requestRepository.saveAll(createdRequests));
 
@@ -130,10 +120,24 @@ public class RequestService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<RequestModel> listRequestsForWorker(UUID workerId) {
+        return requestRepository.findAllRequestsForWorker(workerId).stream()
+                .map(requestMapper::toModel)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<RequestModel> listRequestsForContractor(UUID contractorId) {
+        return requestRepository.findAllRequestsForContractor(contractorId).stream()
+                .map(requestMapper::toModel)
+                .toList();
+    }
+
     /** Estadísticas del trabajador para otros dominios (completedJobs, monthlyEarnings, topServices). */
     @Transactional(readOnly = true)
     public WorkerStatsResponse getWorkerStats(UUID workerId) {
-        long completed = requestRepository.findAllRequestsForUser(workerId).stream()
+        long completed = requestRepository.findAllRequestsForWorker(workerId).stream()
                 .filter(r -> r.getState() == RequestState.COMPLETED)
                 .count();
         return new WorkerStatsResponse(workerId, completed, 0.0, List.of());
@@ -177,10 +181,12 @@ public class RequestService {
 
         if (accepted.isEmpty()) {
             request.setState(RequestState.ACCEPTED);
+            notificationService.notifyAccepted(request.getContractorId(),requestId);
         } else {
             request.setState(RequestState.CONFLICT);
             accepted.forEach(r -> r.setState(RequestState.CONFLICT));
             requestRepository.saveAll(accepted);
+            //notificationService;???
         }
         return requestMapper.toModel(requestRepository.save(request));
     }
@@ -191,6 +197,8 @@ public class RequestService {
         Request request = findAssignedToWorker(requestId, workerId);
         requireAnswerable(request);
         request.setState(RequestState.REJECTED);
+        notificationService.notifyRejected(request.getContractorId(), requestId);
+        //TODO: ELIMINAR FRANJA HORARIA DEL WORKER
         return requestMapper.toModel(requestRepository.save(request));
     }
 
@@ -202,7 +210,7 @@ public class RequestService {
     public RequestModel acceptConflict(UUID requestId, UUID contractorId) {
         Request chosen = requestRepository.findById(requestId)
                 .filter(r -> r.getContractorId().equals(contractorId))
-                .orElseThrow(() -> new RecursoNoEncontradoException(SOLICITUD_NO_ENCONTRADA));
+                .orElseThrow(() -> new RecursoNoEncontradoException(RecursoNoEncontradoException.SOLICITUD_NO_ENCONTRADA));
         if (chosen.getState() != RequestState.CONFLICT) {
             throw new TransicionInvalidaException("Solo se puede resolver un conflicto sobre una solicitud en estado CONFLICT");
         }
@@ -220,6 +228,10 @@ public class RequestService {
         requestRepository.saveAll(others);
 
         chosen.setState(RequestState.ACCEPTED);
+        
+        others.forEach(r -> notificationService.notifyCancelled(r.getContractorId(), requestId));
+
+        //TODO: ELIMINAR FRANJA HORARIA DEL WORKER
         return requestMapper.toModel(requestRepository.save(chosen));
     }
 
@@ -227,7 +239,7 @@ public class RequestService {
         Optional<Request> found = requestRepository.findById(requestId);
 
         if(found.isEmpty()){
-            throw new RecursoNoEncontradoException(SOLICITUD_NO_ENCONTRADA);
+            throw new RecursoNoEncontradoException(RecursoNoEncontradoException.SOLICITUD_NO_ENCONTRADA);
         }
 
         int changed = requestRepository.specialDeleteById(requestId);
@@ -268,7 +280,7 @@ public class RequestService {
     private Request findAssignedToWorker(UUID requestId, UUID workerId) {
         return requestRepository.findById(requestId)
                 .filter(r -> r.getWorkerId().equals(workerId))
-                .orElseThrow(() -> new RecursoNoEncontradoException(SOLICITUD_NO_ENCONTRADA));
+                .orElseThrow(() -> new RecursoNoEncontradoException(RecursoNoEncontradoException.SOLICITUD_NO_ENCONTRADA));
     }
 
     private void requireAnswerable(Request request) {

@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@Primary
 public class HttpNotificationService implements NotificationService {
 
     private static final Logger log = LoggerFactory.getLogger(HttpNotificationService.class);
@@ -43,6 +45,11 @@ public class HttpNotificationService implements NotificationService {
     @Override
     public void notifyCompleted(UUID contractorId, UUID requestId) {
         send(contractorId, "COMPLETED_WORK", requestId, "El trabajo fue reportado como terminado");
+    }
+
+    @Override
+    public void notifyRejected(UUID contractorId, UUID requestId) {
+        send(contractorId, "REJECTED_REQUEST", requestId, "El trabajo fue rechazado por el trabajador");
     }
 
     private void send(UUID receiverId, String type, UUID requestId, String message) {

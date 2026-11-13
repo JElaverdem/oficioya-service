@@ -1,13 +1,16 @@
 package edu.eci.dosw.oficioya.oficioya_service.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import edu.eci.dosw.oficioya.oficioya_service.dto.UserResponse;
 import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
 import edu.eci.dosw.oficioya.oficioya_service.exception.CredencialesInvalidasException;
 import edu.eci.dosw.oficioya.oficioya_service.exception.RecursoNoEncontradoException;
+import edu.eci.dosw.oficioya.oficioya_service.exception.RecursosAjenosException;
 import edu.eci.dosw.oficioya.oficioya_service.mapper.RequestMapper;
 import edu.eci.dosw.oficioya.oficioya_service.model.CancellationState;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestModel;
@@ -23,10 +26,13 @@ public class RequestCancellationService {
 
     private final NotificationService notificationService;
 
-    public RequestCancellationService(RequestRepository requestRepository, RequestMapper requestMapper, NotificationService notificationService) {
+    private final UserClient userClient;
+
+    public RequestCancellationService(RequestRepository requestRepository, RequestMapper requestMapper, NotificationService notificationService, UserClient userClient) {
         this.requestRepository = requestRepository;
         this.requestMapper = requestMapper;
         this.notificationService = notificationService;
+        this.userClient = userClient;
     }
 
     public RequestModel cancelRequest(UUID requestId, UUID userId){
@@ -34,14 +40,17 @@ public class RequestCancellationService {
             throw new RecursoNoEncontradoException("NO_ENCONTRADO");
         }
 
-        /*
-        VERIFICAR SI EL USUARIO EXISTE
-         */
+        if (userClient != null) {
+            UserResponse user = userClient.getUser(userId);
+            if (user == null || user.roles() == null) {
+                throw new RecursoNoEncontradoException("Usuario no válido o inactivo");
+            }
+        }
 
         Request found = requestRepository.findById(requestId).orElse(null);
 
         if(userId != found.getContractorId() && userId != found.getWorkerId()){
-            // TIRAR UN ERROR 403 Y HACER HANDLING
+            throw new RecursosAjenosException();
         }
 
         if(userId == found.getContractorId()){
@@ -81,9 +90,12 @@ public class RequestCancellationService {
             request.setCancellationState(CancellationState.COMPLETED);
         }
         request.setCancellationDateTime(LocalDateTime.now());
+        requestRepository.save(request);
         // Notificar al trabajador que la solicitud fue cancelada (microservicio de notificaciones)
         notificationService.notifyCancelled(request.getWorkerId(), requestId);
-        requestRepository.save(request);
+
+        //TODO: ELIMINAR FRANJA HORARIA DEL WORKER
+
     }
 
     public void cancelByWorker(UUID requestId, UUID workerId) {
@@ -107,9 +119,11 @@ public class RequestCancellationService {
         request.setState(RequestState.CANCELED);
         request.setCancellationState(CancellationState.COMPLETED);
         request.setCancellationDateTime(LocalDateTime.now());
+        requestRepository.save(request);
         // Notificar al contratante que la solicitud fue cancelada (microservicio de notificaciones)
         notificationService.notifyCancelled(request.getContractorId(), requestId);
-        requestRepository.save(request);
+
+        //TODO: ELIMINAR FRANJA HORARIA DEL WORKER
     }
     private void penalizarReputacion(UUID workerId) {
         // TODO: invocar microservicio de reputacion para restar 0.5 puntos

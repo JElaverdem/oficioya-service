@@ -7,4 +7,10 @@ public interface NotificationService {
     void notifyAccepted(UUID contractorId, UUID requestId);
     void notifyCancelled(UUID receiverId, UUID requestId);
     void notifyCompleted(UUID contractorId, UUID requestId);
+    
+    void notifyRejected(UUID contractorId, UUID requestId);
+    
+   /*
+    void notifyConflict(UUID contractorId, UUID requestId);???
+    */
 }
