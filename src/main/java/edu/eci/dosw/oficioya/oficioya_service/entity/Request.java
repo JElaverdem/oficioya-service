@@ -11,6 +11,7 @@ import jakarta.persistence.*;
 @Table(name = "Requests")
 public class Request {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column (name = "root_id", nullable = false)
