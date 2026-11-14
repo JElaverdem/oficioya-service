@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
 import edu.eci.dosw.oficioya.oficioya_service.model.CancellationState;
-import edu.eci.dosw.oficioya.oficioya_service.model.RequestModel;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestState;
 import edu.eci.dosw.oficioya.oficioya_service.mapper.RequestMapper;
 
@@ -36,7 +35,6 @@ public class RequestRepositoryTest {
     void setup(){
         requestRepo.deleteAll();
         r1 = new Request();
-        UUID r1Id = UUID.randomUUID();
         UUID r1Root = UUID.randomUUID();
         UUID r1Contractor = UUID.randomUUID();
         UUID r1Worker = UUID.randomUUID();
@@ -49,7 +47,6 @@ public class RequestRepositoryTest {
         LocalDateTime cancellationDateTime = null;
         CancellationState cancellationState = null;
         
-        r1.setId(r1Id);
         r1.setRootId(r1Root);
         r1.setContractorId(r1Contractor);
         r1.setWorkerId(r1Worker);
@@ -83,7 +80,6 @@ public class RequestRepositoryTest {
     @DisplayName("Debe salvar y consultar solicitudes provenientes de la 'misma pasarela'")
     void shouldSaveAndFindRequestsFromSameRoot(){
         Request r2 = new Request();
-        UUID r2Id = UUID.randomUUID();
         UUID r2Root = r1.getRootId();
         UUID r2Contractor = r1.getContractorId();
         UUID r2Worker = UUID.randomUUID();
@@ -96,7 +92,6 @@ public class RequestRepositoryTest {
         LocalDateTime cancellationDateTime = null;
         CancellationState cancellationState = null;
         
-        r2.setId(r2Id);
         r2.setRootId(r2Root);
         r2.setContractorId(r2Contractor);
         r2.setWorkerId(r2Worker);
@@ -139,7 +134,6 @@ public class RequestRepositoryTest {
     @DisplayName("El usuario no debe ver solicitudes eliminadas")
     void shouldNotSeeUserCanceledRequests(){
         Request r2 = new Request();
-        UUID r2Id = UUID.randomUUID();
         UUID r2Root = r1.getRootId();
         UUID r2Contractor = r1.getContractorId();
         UUID r2Worker = UUID.randomUUID();
@@ -152,7 +146,6 @@ public class RequestRepositoryTest {
         LocalDateTime cancellationDateTime = null;
         CancellationState cancellationState = null;
         
-        r2.setId(r2Id);
         r2.setRootId(r2Root);
         r2.setContractorId(r2Contractor);
         r2.setWorkerId(r2Worker);
@@ -168,10 +161,8 @@ public class RequestRepositoryTest {
         Request saved1 = requestRepo.save(r1);
         Request saved2 = requestRepo.save(r2);
 
-        //Lista lógica que se utilizaría internamente con todas las solicitudes
         List<Request> logicList = requestRepo.findByContractorIdOrWorkerId(saved1.getContractorId(), saved1.getContractorId());
 
-        //Lista que sólo se le mostraría al usuario, excluye las eliminadas
         List<Request> userList = requestRepo.findAllRequestsForUser(saved1.getContractorId());
 
         assertTrue(logicList.contains(saved1));
@@ -188,7 +179,6 @@ public class RequestRepositoryTest {
     @DisplayName("Debe realizar eliminacion lógica y no física")
     void shouldDeleteLogicallyNotPhysically(){
         Request r2 = new Request();
-        UUID r2Id = UUID.randomUUID();
         UUID r2Root = r1.getRootId();
         UUID r2Contractor = r1.getContractorId();
         UUID r2Worker = UUID.randomUUID();
@@ -201,7 +191,6 @@ public class RequestRepositoryTest {
         LocalDateTime cancellationDateTime = null;
         CancellationState cancellationState = null;
         
-        r2.setId(r2Id);
         r2.setRootId(r2Root);
         r2.setContractorId(r2Contractor);
         r2.setWorkerId(r2Worker);
@@ -219,7 +208,6 @@ public class RequestRepositoryTest {
 
         List<Request> ls = requestRepo.findAllRequestsForUser(saved1.getContractorId());
 
-        //El usuario debe ver las dos
         assertTrue(ls.contains(saved1));
         assertTrue(ls.contains(saved2));
 
@@ -231,7 +219,6 @@ public class RequestRepositoryTest {
 
         List<Request> changedList = requestRepo.findAllRequestsForUser(saved1.getContractorId());
 
-        //El usuario ya no debe de ver las dos
         assertTrue(changedList.contains(saved1));
         assertFalse(changedList.contains(saved2));
 
@@ -270,7 +257,6 @@ public class RequestRepositoryTest {
     @DisplayName("Debe filtrar estado en query personalizada")
     void shouldFilterByStateNot(){
         Request r2 = new Request();
-        UUID r2Id = UUID.randomUUID();
         UUID r2Root = r1.getRootId();
         UUID r2Contractor = r1.getContractorId();
         UUID r2Worker = UUID.randomUUID();
@@ -283,7 +269,6 @@ public class RequestRepositoryTest {
         LocalDateTime cancellationDateTime = null;
         CancellationState cancellationState = null;
         
-        r2.setId(r2Id);
         r2.setRootId(r2Root);
         r2.setContractorId(r2Contractor);
         r2.setWorkerId(r2Worker);
@@ -316,7 +301,6 @@ public class RequestRepositoryTest {
     @DisplayName("Debe mostrar todas las solicitudes de un usuario, incluso si es trabajador y contratante")
     void shouldShowAllRequestsEvenIfUserIsWorkerAndContractor(){
         Request r2 = new Request();
-        UUID r2Id = UUID.randomUUID();
         UUID r2Root = UUID.randomUUID();
         UUID r2Contractor = UUID.randomUUID();
         UUID r2Worker = r1.getContractorId();
@@ -329,7 +313,6 @@ public class RequestRepositoryTest {
         LocalDateTime cancellationDateTime = null;
         CancellationState cancellationState = null;
         
-        r2.setId(r2Id);
         r2.setRootId(r2Root);
         r2.setContractorId(r2Contractor);
         r2.setWorkerId(r2Worker);
@@ -407,6 +390,5 @@ public class RequestRepositoryTest {
 
         Request notFound = optionalNotFound.orElse(null);
         assertNull(notFound);
-
     }
 }

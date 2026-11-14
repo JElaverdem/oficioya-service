@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ActiveProfiles;
@@ -98,9 +97,12 @@ class SeguridadRequestTest {
     // ---------------------------------------------------------------- 401
 
     @Test
-    @DisplayName("401: sin token en GET /requests")
+    @DisplayName("401: sin token en GET /requests/worker y /requests/contractor")
     void sinTokenListar() throws Exception {
-        mvc.perform(get(BASE))
+        mvc.perform(get(BASE + "/worker"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401));
+        mvc.perform(get(BASE + "/contractor"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.status").value(401));
     }
@@ -120,7 +122,7 @@ class SeguridadRequestTest {
         String expirado = construirToken(trabajadorA, "TRABAJADOR", clavePropia(), ISSUER,
                 Instant.now().minus(2, ChronoUnit.HOURS), Instant.now().minus(1, ChronoUnit.HOURS));
 
-        mvc.perform(get(BASE).header("Authorization", "Bearer " + expirado))
+        mvc.perform(get(BASE + "/worker").header("Authorization", "Bearer " + expirado))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -132,7 +134,7 @@ class SeguridadRequestTest {
         String falso = construirToken(trabajadorA, "TRABAJADOR", otra, ISSUER,
                 Instant.now(), Instant.now().plus(30, ChronoUnit.MINUTES));
 
-        mvc.perform(get(BASE).header("Authorization", "Bearer " + falso))
+        mvc.perform(get(BASE + "/worker").header("Authorization", "Bearer " + falso))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -159,7 +161,7 @@ class SeguridadRequestTest {
         String token = construirToken(trabajadorA, "TRABAJADOR", clavePropia(), "otro-emisor",
                 Instant.now(), Instant.now().plus(30, ChronoUnit.MINUTES));
 
-        mvc.perform(get(BASE).header("Authorization", "Bearer " + token))
+        mvc.perform(get(BASE + "/worker").header("Authorization", "Bearer " + token))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -175,16 +177,16 @@ class SeguridadRequestTest {
                 .signWith(clavePropia(), Jwts.SIG.HS256)
                 .compact();
 
-        mvc.perform(get(BASE).header("Authorization", "Bearer " + token))
+        mvc.perform(get(BASE + "/worker").header("Authorization", "Bearer " + token))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @DisplayName("401: token con formato inválido y esquema de autorización distinto de Bearer")
     void tokenMalformadoYEsquemaIncorrecto() throws Exception {
-        mvc.perform(get(BASE).header("Authorization", "Bearer esto-no-es-un-jwt"))
+        mvc.perform(get(BASE + "/worker").header("Authorization", "Bearer esto-no-es-un-jwt"))
                 .andExpect(status().isUnauthorized());
-        mvc.perform(get(BASE).header("Authorization", "Basic dXNlcjpwYXNz"))
+        mvc.perform(get(BASE + "/worker").header("Authorization", "Basic dXNlcjpwYXNz"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -227,7 +229,9 @@ class SeguridadRequestTest {
                 .andExpect(status().isForbidden());
         mvc.perform(patch(BASE + "/" + id + "/reject").header("Authorization", admin))
                 .andExpect(status().isForbidden());
-        mvc.perform(get(BASE).header("Authorization", admin))
+        mvc.perform(get(BASE + "/worker").header("Authorization", admin))
+                .andExpect(status().isForbidden());
+        mvc.perform(get(BASE + "/contractor").header("Authorization", admin))
                 .andExpect(status().isForbidden());
     }
 
@@ -242,7 +246,7 @@ class SeguridadRequestTest {
                 .signWith(clavePropia(), Jwts.SIG.HS256)
                 .compact();
 
-        mvc.perform(get(BASE).header("Authorization", "Bearer " + sinRol))
+        mvc.perform(get(BASE + "/worker").header("Authorization", "Bearer " + sinRol))
                 .andExpect(status().isForbidden());
     }
 
@@ -315,22 +319,22 @@ class SeguridadRequestTest {
     }
 
     @Test
-    @DisplayName("GET /requests solo devuelve las solicitudes del usuario autenticado")
+    @DisplayName("GET /requests/worker y /contractor solo devuelven las solicitudes del usuario autenticado")
     void listarSoloLasPropias() throws Exception {
         Request deA = guardar(contratanteA, trabajadorA, RequestState.PENDING, LocalDateTime.now());
         guardar(contratanteB, trabajadorB, RequestState.PENDING, LocalDateTime.now());
 
-        mvc.perform(get(BASE).header("Authorization", tokenDe(trabajadorA, "TRABAJADOR")))
+        mvc.perform(get(BASE + "/worker").header("Authorization", tokenDe(trabajadorA, "TRABAJADOR")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(deA.getId().toString()));
 
-        mvc.perform(get(BASE).header("Authorization", tokenDe(contratanteA, "CONTRATANTE")))
+        mvc.perform(get(BASE + "/contractor").header("Authorization", tokenDe(contratanteA, "CONTRATANTE")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(deA.getId().toString()));
 
-        mvc.perform(get(BASE).header("Authorization", tokenDe(UUID.randomUUID(), "TRABAJADOR")))
+        mvc.perform(get(BASE + "/worker").header("Authorization", tokenDe(UUID.randomUUID(), "TRABAJADOR")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
     }
@@ -375,7 +379,7 @@ class SeguridadRequestTest {
     }
 
     @Test
-    @DisplayName("/auth/login es público y el token que entrega abre /requests")
+    @DisplayName("/auth/login es público y el token que entrega abre /requests/worker o /contractor")
     void loginEsPublicoYEntregaTokenUtil() throws Exception {
         String respuesta = mvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -388,7 +392,13 @@ class SeguridadRequestTest {
             token = jsonCampo(respuesta, "accessToken");
         }
 
-        mvc.perform(get(BASE).header("Authorization", "Bearer " + token))
+        String payload = new String(
+                Base64.getUrlDecoder().decode(token.split("\\.")[1]),
+                StandardCharsets.UTF_8);
+        String rol = jsonCampo(payload, "role");
+        String ruta = "CONTRATANTE".equalsIgnoreCase(rol) ? "/contractor" : "/worker";
+
+        mvc.perform(get(BASE + ruta).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
     }
 
@@ -440,7 +450,6 @@ class SeguridadRequestTest {
 
     private Request guardar(UUID contratante, UUID trabajador, RequestState estado, LocalDateTime creada) {
         Request r = new Request();
-        r.setId(UUID.randomUUID());
         r.setRootId(UUID.randomUUID());
         r.setContractorId(contratante);
         r.setWorkerId(trabajador);
