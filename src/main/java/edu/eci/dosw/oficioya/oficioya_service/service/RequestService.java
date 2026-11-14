@@ -28,6 +28,8 @@ import edu.eci.dosw.oficioya.oficioya_service.model.CancellationState;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestModel;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestState;
 import edu.eci.dosw.oficioya.oficioya_service.repository.RequestRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class RequestService {
@@ -41,6 +43,7 @@ public class RequestService {
     private final ResponseMapper responseMapper;
     private final NotificationService notificationService;
     private final UserClient userClient;
+    private static final Logger log = LoggerFactory.getLogger(RequestService.class);
 
     public RequestService(RequestRepository requestRepository, RequestMapper requestMapper, ResponseMapper responseMapper, NotificationService notificationService, UserClient userClient) {
         this.requestRepository = requestRepository;
@@ -51,6 +54,7 @@ public class RequestService {
     }
 
     public RequestResponse create(RequestRequest req, UUID contractorId){
+        log.info("Creando una nueva request");
         List<UUID> workers = req.workersId();
 
         if(workers.size() <= 0){
