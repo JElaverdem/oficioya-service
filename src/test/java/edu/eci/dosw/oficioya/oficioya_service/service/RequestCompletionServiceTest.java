@@ -8,11 +8,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +23,8 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import edu.eci.dosw.oficioya.oficioya_service.entity.Request;
+import edu.eci.dosw.oficioya.oficioya_service.exception.RecursoNoEncontradoException;
+import edu.eci.dosw.oficioya.oficioya_service.exception.RecursosAjenosException;
 import edu.eci.dosw.oficioya.oficioya_service.mapper.RequestMapper;
 import edu.eci.dosw.oficioya.oficioya_service.mapper.ResponseMapper;
 import edu.eci.dosw.oficioya.oficioya_service.model.RequestState;
@@ -37,12 +37,12 @@ class RequestCompletionServiceTest {
     @Mock
     RequestRepository requestRepository;
 
-    @Mock 
+    @Mock
     ResponseMapper responseMapper;
 
     @Mock
     NotificationService notificationService;
-    
+
     @Spy
     RequestMapper requestMapper = Mappers.getMapper(RequestMapper.class);
 
@@ -60,6 +60,7 @@ class RequestCompletionServiceTest {
 
         assertEquals(RequestState.COMPLETED, r.getState());
         verify(requestRepository).save(r);
+        verify(notificationService).notifyCompleted(r.getContractorId(), r.getId());
     }
 
     @Test
@@ -68,12 +69,12 @@ class RequestCompletionServiceTest {
         Request r = solicitud(UUID.randomUUID(), RequestState.ACCEPTED);
         when(requestRepository.findById(r.getId())).thenReturn(Optional.of(r));
 
-        RuntimeException ex = assertThrows(RuntimeException.class,
+        assertThrows(RecursosAjenosException.class,
                 () -> service.completeRequest(r.getId(), UUID.randomUUID()));
 
-        assertEquals("Solo el trabajador asignado puede completar esta solicitud", ex.getMessage());
         assertEquals(RequestState.ACCEPTED, r.getState());
         verify(requestRepository, never()).save(any());
+        verify(notificationService, never()).notifyCompleted(any(), any());
     }
 
     @ParameterizedTest
@@ -90,15 +91,19 @@ class RequestCompletionServiceTest {
         assertEquals("Solo se pueden completar solicitudes en estado ACCEPTED", ex.getMessage());
         assertEquals(estado, r.getState());
         verify(requestRepository, never()).save(any());
+        verify(notificationService, never()).notifyCompleted(any(), any());
     }
 
     @Test
-    @DisplayName("completar una solicitud inexistente lanza NoSuchElementException")
+    @DisplayName("completar una solicitud inexistente lanza RecursoNoEncontradoException")
     void completarInexistente() {
         UUID id = UUID.randomUUID();
         when(requestRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class, () -> service.completeRequest(id, UUID.randomUUID()));
+        RecursoNoEncontradoException ex = assertThrows(RecursoNoEncontradoException.class,
+                () -> service.completeRequest(id, UUID.randomUUID()));
+
+        assertEquals(RecursoNoEncontradoException.SOLICITUD_NO_ENCONTRADA, ex.getMessage());
     }
 
     private Request solicitud(UUID trabajador, RequestState estado) {
